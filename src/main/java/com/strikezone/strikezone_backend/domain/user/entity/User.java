@@ -7,10 +7,17 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Table(name = "users")
-@Builder
 public class User extends BaseEntity {
+
+    @Builder
+    public User(String username, String email, String password, String role, String bio) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.bio = bio;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +36,7 @@ public class User extends BaseEntity {
     private String role;
 
     @Lob
-    @Column(nullable = true)
+    @Column
     private String bio;
 
 }

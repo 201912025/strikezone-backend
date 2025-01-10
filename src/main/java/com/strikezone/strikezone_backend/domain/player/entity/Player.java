@@ -8,25 +8,32 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Table(name = "players")
 public class Player extends BaseEntity{
+
+    public Player(String name, Team team, String position, Integer number, String photoUrl) {
+        this.name = name;
+        this.team = team;
+        this.position = position;
+        this.number = number;
+        this.photoUrl = photoUrl;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long playerId;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 30)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @Column(length = 50)
+    @Column(nullable = false, length = 10)
     private String position;
 
+    @Column(nullable = false, length = 3)
     private Integer number;
 
     @Column(length = 255)

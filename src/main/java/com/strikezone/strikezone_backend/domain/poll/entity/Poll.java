@@ -9,16 +9,21 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Table(name = "polls")
 public class Poll extends BaseEntity{
+
+    public Poll(String title, String description, LocalDateTime startDate, LocalDateTime endDate) {
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pollId;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = 50)
     private String title;
 
     @Lob
