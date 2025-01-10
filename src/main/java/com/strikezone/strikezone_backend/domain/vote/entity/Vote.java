@@ -5,9 +5,9 @@ import com.strikezone.strikezone_backend.domain.poll.entity.PollOption;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 
@@ -17,19 +17,26 @@ import java.time.LocalDateTime;
 @Table(name = "votes")
 public class Vote {
 
+    @Builder
+    public Vote(User user, Poll poll, PollOption option) {
+        this.user = user;
+        this.poll = poll;
+        this.option = option;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long voteId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id", nullable = false)
     private Poll poll;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "option_id", nullable = false)
     private PollOption option;
 

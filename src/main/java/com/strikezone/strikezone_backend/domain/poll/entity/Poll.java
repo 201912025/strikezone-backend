@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "polls")
 public class Poll extends BaseEntity{
 
+    @Builder
     public Poll(String title, String description, LocalDateTime startDate, LocalDateTime endDate) {
         this.title = title;
         this.description = description;
