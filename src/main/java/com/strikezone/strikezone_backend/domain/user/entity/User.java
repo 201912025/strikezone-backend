@@ -2,15 +2,14 @@ package com.strikezone.strikezone_backend.domain.user.entity;
 
 import com.strikezone.strikezone_backend.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "users")
+@Builder
 public class User extends BaseEntity {
 
     @Id
@@ -25,6 +24,9 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, length = 255)
     private String password;
+
+    @Column(nullable = false)
+    private String role;
 
     @Lob
     @Column(nullable = true)
