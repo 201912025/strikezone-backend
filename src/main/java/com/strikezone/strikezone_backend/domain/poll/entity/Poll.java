@@ -2,16 +2,15 @@ package com.strikezone.strikezone_backend.domain.poll.entity;
 
 import com.strikezone.strikezone_backend.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Table(name = "polls")
 public class Poll extends BaseEntity{
 
