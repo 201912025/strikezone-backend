@@ -36,7 +36,6 @@ public class UserService {
                 .team(joinServiceDTO.getTeam())
                 .build();
 
-
         userRepository.save(user);
     }
 
