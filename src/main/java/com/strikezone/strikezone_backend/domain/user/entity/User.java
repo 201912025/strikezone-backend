@@ -12,11 +12,13 @@ import lombok.*;
 public class User extends BaseEntity {
 
     @Builder
-    public User(String username, String email, String password, String role, String bio, Team team) {
+    public User(String username, String email, String password, String role, String gender, String birthDay, String bio, Team team) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.gender = gender;
+        this.birthDay = birthDay;
         this.bio = bio;
         this.team = team;
     }
@@ -56,4 +58,7 @@ public class User extends BaseEntity {
         this.team = team;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

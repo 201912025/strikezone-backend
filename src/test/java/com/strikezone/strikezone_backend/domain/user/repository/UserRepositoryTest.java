@@ -1,11 +1,15 @@
 package com.strikezone.strikezone_backend.domain.user.repository;
 
 import com.strikezone.strikezone_backend.domain.user.entity.User;
+import com.strikezone.strikezone_backend.domain.user.exception.UserExceptionType;
+import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,7 +34,8 @@ class UserRepositoryTest {
         userRepository.save(user1);
 
         // when
-        User foundUser = userRepository.findByUsername("johndoe");
+        User foundUser = userRepository.findByUsername("johndoe")
+                .orElseThrow(() -> new NotFoundException(UserExceptionType.NOT_FOUND_USER));
 
         // then
         assertThat(foundUser).isNotNull();
