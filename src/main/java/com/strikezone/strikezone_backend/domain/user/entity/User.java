@@ -28,7 +28,6 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, length = 20)
     private String username;
 
-    @Column
     private String email;
 
     @Column(nullable = false, length = 20)
@@ -36,6 +35,10 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String role;
+
+    private String gender;
+
+    private String birthDay;
 
     @Lob
     @Column
@@ -45,14 +48,6 @@ public class User extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void setBio(String bio) {
         this.bio = bio;
     }
@@ -60,4 +55,5 @@ public class User extends BaseEntity {
     public void setTeam(Team team) {
         this.team = team;
     }
+
 }
