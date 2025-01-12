@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)  // MockitoExtension을 사용하여 Mockito 관련 어노테이션 처리
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
