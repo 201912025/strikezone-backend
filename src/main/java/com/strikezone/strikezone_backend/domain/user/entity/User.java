@@ -1,6 +1,6 @@
 package com.strikezone.strikezone_backend.domain.user.entity;
 
-import com.strikezone.strikezone_backend.domain.team.Team;
+import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

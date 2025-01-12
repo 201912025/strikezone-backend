@@ -1,4 +1,4 @@
-package com.strikezone.strikezone_backend.domain.team;
+package com.strikezone.strikezone_backend.domain.team.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

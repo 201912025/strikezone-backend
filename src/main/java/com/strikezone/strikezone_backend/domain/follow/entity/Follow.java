@@ -1,7 +1,7 @@
 package com.strikezone.strikezone_backend.domain.follow.entity;
 
 import com.strikezone.strikezone_backend.domain.player.entity.Player;
-import com.strikezone.strikezone_backend.domain.team.Team;
+import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
