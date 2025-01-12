@@ -1,5 +1,6 @@
 package com.strikezone.strikezone_backend.domain.user.entity;
 
+import com.strikezone.strikezone_backend.domain.team.Team;
 import com.strikezone.strikezone_backend.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,12 +12,13 @@ import lombok.*;
 public class User extends BaseEntity {
 
     @Builder
-    public User(String username, String email, String password, String role, String bio) {
+    public User(String username, String email, String password, String role, String bio, Team team) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
         this.bio = bio;
+        this.team = team;
     }
 
     @Id
@@ -39,4 +41,23 @@ public class User extends BaseEntity {
     @Column
     private String bio;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 }
