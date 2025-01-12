@@ -5,14 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class UpdateUserDTO {
+public class UpdateUserServiceDTO {
 
     private String email;
     private String bio;
     private Team team;
 
     @Builder
-    public UpdateUserDTO(String email, String bio, Team team) {
+    public UpdateUserServiceDTO(String email, String bio, Team team) {
         this.email = email;
         this.bio = bio;
         this.team = team;
