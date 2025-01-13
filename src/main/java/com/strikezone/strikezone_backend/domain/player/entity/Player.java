@@ -11,6 +11,7 @@ import lombok.*;
 @Table(name = "players")
 public class Player extends BaseEntity{
 
+    @Builder
     public Player(String name, Team team, String position, Integer number, String photoUrl) {
         this.name = name;
         this.team = team;

@@ -9,6 +9,7 @@ import lombok.*;
 @Table(name = "poll_options")
 public class PollOption {
 
+    @Builder
     public PollOption(Poll poll, String optionText) {
         this.poll = poll;
         this.optionText = optionText;

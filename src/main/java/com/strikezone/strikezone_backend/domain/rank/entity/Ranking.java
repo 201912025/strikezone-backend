@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "rankings")
 public class Ranking {
 
+    @Builder
     public Ranking(User user, Team team, Player player, String period) {
         this.user = user;
         this.team = team;

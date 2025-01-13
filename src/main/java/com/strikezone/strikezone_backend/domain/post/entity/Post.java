@@ -16,6 +16,7 @@ import java.util.List;
 @Table(name = "posts")
 public class Post extends BaseEntity {
 
+    @Builder
     public Post(User user, Team team, String title, String content) {
         this.user = user;
         this.team = team;
