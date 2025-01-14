@@ -1,20 +1,17 @@
-package com.strikezone.strikezone_backend.global.common;
+package com.strikezone.strikezone_backend.domain.healthCheck;
 
-
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@ResponseBody
-@Controller
+@RestController
+@RequestMapping
 public class HealthChecker {
 
-    @GetMapping("/")
-    public String mainP() {
+    @GetMapping()
+    public String checkHealth() {
 
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        return "✅ server is running";
 
-        return "main Controller : " + name;
     }
 }
