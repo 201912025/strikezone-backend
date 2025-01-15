@@ -9,8 +9,7 @@ import lombok.*;
 @Table(name = "teams")
 public class Team {
 
-    @Builder
-    public Team(String name) {
+    public Team(TeamName name) {
         this.name = name;
     }
 
@@ -18,7 +17,8 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long teamId;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TeamName name;
 
 }
