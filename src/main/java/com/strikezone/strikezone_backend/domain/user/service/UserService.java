@@ -6,7 +6,9 @@ import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.exception.UserExceptionType;
 import com.strikezone.strikezone_backend.domain.user.repository.UserRepository;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
+import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +52,7 @@ public class UserService {
 
     public User getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BadRequestException(UserExceptionType.NOT_FOUND_USER));
+                .orElseThrow(() -> new NotFoundException(UserExceptionType.NOT_FOUND_USER));
 
         return user;
     }
@@ -58,11 +60,11 @@ public class UserService {
     @Transactional
     public void updateUser(UpdateUserServiceDTO updateUserServiceDTO, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() ->new BadRequestException(UserExceptionType.NOT_FOUND_USER));
+                .orElseThrow(() ->new NotFoundException(UserExceptionType.NOT_FOUND_USER));
 
-        user.setBio(updateUserServiceDTO.getBio());
+        user.setEmail(updateUserServiceDTO.getBio());
         user.setTeam(updateUserServiceDTO.getTeam());
-        user.setEmail(updateUserServiceDTO.getEmail());
+        user.setBio(updateUserServiceDTO.getEmail());
 
         userRepository.save(user);
     }
@@ -70,8 +72,17 @@ public class UserService {
     @Transactional
     public void deleteUser(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BadRequestException(UserExceptionType.NOT_FOUND_USER));
+                .orElseThrow(() -> new NotFoundException(UserExceptionType.NOT_FOUND_USER));
 
         userRepository.delete(user);
     }
+
+    public User getUserBySecurity() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(UserExceptionType.NOT_FOUND_USER));
+
+        return user;
+    }
+
 }
