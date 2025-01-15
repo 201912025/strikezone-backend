@@ -5,6 +5,7 @@ import com.strikezone.strikezone_backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,6 +14,7 @@ import java.util.List;
 @Table(name = "teams")
 public class Team {
 
+    @Builder
     public Team(TeamName name) {
         this.name = name;
     }
@@ -22,13 +24,31 @@ public class Team {
     private Long teamId;
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
-    private List<Player> players;
+    private List<Player> players = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TeamName name;
+
+    public void addUser(User user) {
+        if (user != null) {
+            this.users.add(user);
+            user.setTeam(this);
+        }
+    }
+
+    public void addPlayer(Player player) {
+        if (player != null) {
+            players.add(player);
+            player.setTeam(this);
+        }
+    }
+
+    public void changeName(TeamName teamName) {
+        this.name = teamName;
+    }
 
 }

@@ -40,4 +40,15 @@ public class Player extends BaseEntity{
     @Column(length = 255)
     private String photoUrl;
 
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
 }
