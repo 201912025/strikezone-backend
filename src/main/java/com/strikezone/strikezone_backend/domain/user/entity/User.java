@@ -42,11 +42,9 @@ public class User extends BaseEntity {
 
     private String birthDay;
 
-    @Lob
-    @Column
     private String bio;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
 
