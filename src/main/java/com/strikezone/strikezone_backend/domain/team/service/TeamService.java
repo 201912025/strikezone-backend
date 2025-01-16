@@ -41,9 +41,11 @@ public class TeamService {
     @Transactional
     public Team createTeam(CreateTeamServiceDTO teamServiceDTO) {
         TeamName teamName = TeamName.valueOf(teamServiceDTO.getTeamName().toUpperCase());
+
         if (teamRepository.existsByName(teamName)) {
             throw new BadRequestException(TeamExceptionType.DUPLICATED_TEAM_NAME);
         }
+
         Team team = Team.builder()
                 .name(teamName)
                 .build();
@@ -54,6 +56,7 @@ public class TeamService {
     public Team updateTeam(UpdateTeamServiceDTO teamServiceDTO) {
         Team team = teamRepository.findById(teamServiceDTO.getTeamId())
                 .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
+
         TeamName newName = TeamName.valueOf(teamServiceDTO.getTeamName().toUpperCase());
         team.changeName(newName);
         return team;
@@ -77,11 +80,6 @@ public class TeamService {
         team.addUser(user);
 
         return teamRepository.save(team);
-    }
-
-    @Transactional
-    public void addPlayerToTeam(Long teamId, Long playerId) {
-
     }
 
 }

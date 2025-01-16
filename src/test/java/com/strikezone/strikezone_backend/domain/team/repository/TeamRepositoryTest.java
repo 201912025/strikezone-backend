@@ -27,7 +27,7 @@ class TeamRepositoryTest {
     void findByName() {
         // given
         Team team1 = Team.builder()
-                .name(TeamName.KIA)  // TeamName은 enum으로 정의되어 있다고 가정
+                .name(TeamName.KIA)
                 .build();
         teamRepository.save(team1);
 
