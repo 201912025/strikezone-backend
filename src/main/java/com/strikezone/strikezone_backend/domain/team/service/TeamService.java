@@ -27,17 +27,6 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
-    public Team getTeamById(Long teamId) {
-        return teamRepository.findById(teamId)
-                .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
-    }
-
-    public Team getTeamByName(String teamName) {
-        TeamName name = TeamName.valueOf(teamName.toUpperCase());
-        return teamRepository.findByName(name)
-                .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
-    }
-
     @Transactional
     public Team createTeam(CreateTeamServiceDTO teamServiceDTO) {
         TeamName teamName = TeamName.valueOf(teamServiceDTO.getTeamName().toUpperCase());
@@ -71,15 +60,24 @@ public class TeamService {
     }
 
     @Transactional
-    public Team addUserToTeam(Long teamId) {
+    public void addUserToTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
 
         User user = userService.getUserBySecurity();
 
         team.addUser(user);
-
-        return teamRepository.save(team);
+        teamRepository.save(team);
     }
 
 }
+
+/*
+    @Transactional
+    public void addPlayerToTeam(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
+
+        team.addPlayer(user);
+    }
+    */
