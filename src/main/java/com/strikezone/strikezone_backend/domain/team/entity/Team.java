@@ -46,9 +46,5 @@ public class Team {
             player.setTeam(this);
         }
     }
-
-    public void changeName(TeamName teamName) {
-        this.name = teamName;
-    }
-
+    
 }

@@ -1,7 +1,6 @@
 package com.strikezone.strikezone_backend.domain.team.service;
 
 import com.strikezone.strikezone_backend.domain.team.dto.service.CreateTeamServiceDTO;
-import com.strikezone.strikezone_backend.domain.team.dto.service.UpdateTeamServiceDTO;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
@@ -39,16 +38,6 @@ public class TeamService {
                 .name(teamName)
                 .build();
         return teamRepository.save(team);
-    }
-
-    @Transactional
-    public Team updateTeam(UpdateTeamServiceDTO teamServiceDTO) {
-        Team team = teamRepository.findById(teamServiceDTO.getTeamId())
-                .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
-
-        TeamName newName = TeamName.valueOf(teamServiceDTO.getTeamName().toUpperCase());
-        team.changeName(newName);
-        return team;
     }
 
     @Transactional

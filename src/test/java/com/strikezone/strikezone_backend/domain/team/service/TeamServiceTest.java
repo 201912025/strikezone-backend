@@ -1,7 +1,6 @@
 package com.strikezone.strikezone_backend.domain.team.service;
 
 import com.strikezone.strikezone_backend.domain.team.dto.service.CreateTeamServiceDTO;
-import com.strikezone.strikezone_backend.domain.team.dto.service.UpdateTeamServiceDTO;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.repository.TeamRepository;
@@ -9,7 +8,6 @@ import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.service.UserService;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
