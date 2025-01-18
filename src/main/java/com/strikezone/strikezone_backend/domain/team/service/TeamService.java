@@ -22,7 +22,7 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final UserService userService;
-    public List<Team> getAllTeams() {
+    public List<Team> findAllTeams() {
         return teamRepository.findAll();
     }
 

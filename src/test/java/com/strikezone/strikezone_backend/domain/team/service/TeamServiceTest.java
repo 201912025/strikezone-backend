@@ -93,7 +93,7 @@ class TeamServiceTest {
         when(teamRepository.findAll()).thenReturn(Arrays.asList(team1, team2));
 
         // when
-        List<Team> teams = teamService.getAllTeams();
+        List<Team> teams = teamService.findAllTeams();
 
         // then
         verify(teamRepository, times(1)).findAll();
