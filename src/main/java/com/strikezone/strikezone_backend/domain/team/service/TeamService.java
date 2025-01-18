@@ -26,6 +26,13 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
+    public Team findTeamById(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
+
+        return team;
+    }
+
     @Transactional
     public Team createTeam(CreateTeamServiceDTO teamServiceDTO) {
         TeamName teamName = TeamName.valueOf(teamServiceDTO.getTeamName().toUpperCase());
@@ -41,7 +48,7 @@ public class TeamService {
     }
 
     @Transactional
-    public void deleteTeam(Long teamId) {
+    public void deleteTeamById(Long teamId) {
         if (!teamRepository.existsById(teamId)) {
             throw new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM);
         }

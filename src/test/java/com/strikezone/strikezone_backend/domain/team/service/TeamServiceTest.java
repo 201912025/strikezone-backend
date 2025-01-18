@@ -63,7 +63,24 @@ class TeamServiceTest {
     }
 
     @Test
-    @DisplayName("모든 팀을 가져오는 테스트")
+    @DisplayName("특정 팀을 가져올시 팀 반환 성공하는 테스트 ")
+    void getTeamSuccess() {
+        //given
+        Team team = Team.builder()
+                .name(TeamName.두산)
+                .build();
+
+        //when
+        when(teamRepository.findById(1L)).thenReturn(java.util.Optional.of(team));
+
+        Team testTeam = teamService.findTeamById(1L);
+
+        assertThat(testTeam).isNotNull();
+        assertThat(testTeam.getName()).isEqualTo(TeamName.두산);
+    }
+
+    @Test
+    @DisplayName("모든 팀을 가져올시 모든팀 반환 성공하는 테스트")
     void getAllTeamsSuccess() {
         // given
         Team team1 = Team.builder()
@@ -151,7 +168,7 @@ class TeamServiceTest {
         doNothing().when(teamRepository).deleteById(1L);
 
         // when
-        teamService.deleteTeam(1L);
+        teamService.deleteTeamById(1L);
 
         // then
         verify(teamRepository, times(1)).deleteById(1L);
@@ -164,7 +181,7 @@ class TeamServiceTest {
         when(teamRepository.existsById(1L)).thenReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> teamService.deleteTeam(1L))
+        assertThatThrownBy(() -> teamService.deleteTeamById(1L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("팀을 찾을 수 없습니다.");
     }

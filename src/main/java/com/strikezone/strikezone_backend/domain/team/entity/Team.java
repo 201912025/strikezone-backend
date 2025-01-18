@@ -46,5 +46,5 @@ public class Team {
             player.setTeam(this);
         }
     }
-    
+
 }
