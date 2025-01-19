@@ -42,7 +42,7 @@ class TeamControllerTest {
 
         when(teamService.findTeamById(1L)).thenReturn(team);
 
-        mockMvc.perform(get("/api/team/1"))
+        mockMvc.perform(get("/api/teams/1"))
                 .andExpect(status().isOk())  // 응답 상태 코드 확인
                 .andExpect(jsonPath("$.teamName").value("두산"));  // 응답 내용 검증
 

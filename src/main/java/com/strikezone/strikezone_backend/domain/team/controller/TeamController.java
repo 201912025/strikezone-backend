@@ -12,19 +12,19 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/teams")
 public class TeamController {
 
     private final TeamService teamService;
 
-    @GetMapping("/team/{teamId}")
-    public ResponseEntity<TeamWithPlayerNamesResponseDTO> getTeam(@PathVariable Long teamId) {
+    @GetMapping("/{teamId}")
+    public ResponseEntity<TeamWithPlayerNamesResponseDTO> getTeamById(@PathVariable Long teamId) {
         Team team = teamService.findTeamById(teamId);
 
         return ResponseEntity.ok(TeamWithPlayerNamesResponseDTO.from(team));
     }
 
-    @GetMapping("/teams")
+    @GetMapping
     public ResponseEntity<List<TeamWithPlayerNamesResponseDTO>> getAllTeams() {
         List<Team> teams = teamService.findAllTeams();
 
