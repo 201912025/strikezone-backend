@@ -73,4 +73,19 @@ class TeamControllerTest {
                 .andExpect(jsonPath("$[1].playersNames").isEmpty());
     }
 
+    @Test
+    @DisplayName("특정 팀 삭제시 No Content 상태 코드가 반환된다.")
+    @WithMockUser(value = "kim", roles = "USERS")
+    void deleteTeam() throws Exception {
+        Long teamId = 1L;
+
+        doNothing().when(teamService).deleteTeamById(teamId);
+
+        mockMvc.perform(delete("/api/teams/{teamId}", teamId))
+                .andExpect(status().isNoContent());
+
+        verify(teamService, times(1)).deleteTeamById(teamId);
+    }
+
+
 }
