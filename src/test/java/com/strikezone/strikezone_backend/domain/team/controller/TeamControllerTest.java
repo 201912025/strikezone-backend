@@ -1,6 +1,7 @@
 package com.strikezone.strikezone_backend.domain.team.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.strikezone.strikezone_backend.domain.team.dto.controller.response.TeamWithPlayerNamesResponseDTO;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
@@ -15,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,41 +39,48 @@ class TeamControllerTest {
     @DisplayName("특정 팀 조회시 특정 팀을 반환한다.")
     @WithMockUser(value = "kim", roles = "USERS")
     void getTeam() throws Exception {
-        Team team = Team.builder()
-                .name(TeamName.두산).build();
+        TeamWithPlayerNamesResponseDTO teamDTO = TeamWithPlayerNamesResponseDTO.builder()
+                .teamName("두산")
+                .build();
 
-        when(teamService.findTeamById(1L)).thenReturn(team);
+        when(teamService.findTeamByIdAsDTO(1L)).thenReturn(teamDTO);
 
         mockMvc.perform(get("/api/teams/1"))
-                .andExpect(status().isOk())  // 응답 상태 코드 확인
-                .andExpect(jsonPath("$.teamName").value("두산"));  // 응답 내용 검증
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.teamName").value("두산"));
 
-        verify(teamService, times(1)).findTeamById(1L);
+        verify(teamService, times(1)).findTeamByIdAsDTO(1L);
     }
+
 
     @Test
     @DisplayName("조회시 모든 팀을 반환한다.")
     @WithMockUser(value = "kim", roles = "USERS")
     void getAllTeams() throws Exception {
-        Team team1 = Team.builder()
-                .name(TeamName.KIA)
+        TeamWithPlayerNamesResponseDTO team1DTO = TeamWithPlayerNamesResponseDTO.builder()
+                .teamId(1L)
+                .teamName("KIA")
+                .playersNames(Collections.emptyList())
                 .build();
 
-        Team team2 = Team.builder()
-                .name(TeamName.LG)
+        TeamWithPlayerNamesResponseDTO team2DTO = TeamWithPlayerNamesResponseDTO.builder()
+                .teamId(2L)
+                .teamName("LG")
+                .playersNames(Collections.emptyList())
                 .build();
 
-        when(teamService.findAllTeams()).thenReturn(Arrays.asList(team1, team2));
+        when(teamService.findAllTeamsAsDTO()).thenReturn(Arrays.asList(team1DTO, team2DTO));
 
         mockMvc.perform(get("/api/teams"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].teamId").value(team1.getTeamId()))
-                .andExpect(jsonPath("$[0].teamName").value(team1.getName().toString()))
-                .andExpect(jsonPath("$[1].teamId").value(team2.getTeamId()))
-                .andExpect(jsonPath("$[1].teamName").value(team2.getName().toString()))
+                .andExpect(jsonPath("$[0].teamId").value(team1DTO.getTeamId()))
+                .andExpect(jsonPath("$[0].teamName").value(team1DTO.getTeamName()))
                 .andExpect(jsonPath("$[0].playersNames").isEmpty())
+                .andExpect(jsonPath("$[1].teamId").value(team2DTO.getTeamId()))
+                .andExpect(jsonPath("$[1].teamName").value(team2DTO.getTeamName()))
                 .andExpect(jsonPath("$[1].playersNames").isEmpty());
     }
+
 
     @Test
     @DisplayName("특정 팀 삭제시 No Content 상태 코드가 반환된다.")

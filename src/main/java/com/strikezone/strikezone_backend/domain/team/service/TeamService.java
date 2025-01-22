@@ -1,5 +1,6 @@
 package com.strikezone.strikezone_backend.domain.team.service;
 
+import com.strikezone.strikezone_backend.domain.team.dto.controller.response.TeamWithPlayerNamesResponseDTO;
 import com.strikezone.strikezone_backend.domain.team.dto.service.CreateTeamServiceDTO;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +28,27 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
+    public List<TeamWithPlayerNamesResponseDTO> findAllTeamsAsDTO() {
+        List<Team> teams = teamRepository.findAllTeamsWithPlayers();
+
+        return teams.stream()
+                .map(TeamWithPlayerNamesResponseDTO::from)
+                .collect(Collectors.toList());
+    }
+
     public Team findTeamById(Long teamId) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findTeamWithPlayersById(teamId)
                 .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
 
         return team;
     }
+
+    public TeamWithPlayerNamesResponseDTO findTeamByIdAsDTO(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
+        return TeamWithPlayerNamesResponseDTO.from(team);
+    }
+
 
     @Transactional
     public Team createTeam(CreateTeamServiceDTO teamServiceDTO) {
@@ -44,6 +61,7 @@ public class TeamService {
         Team team = Team.builder()
                 .name(teamName)
                 .build();
+
         return teamRepository.save(team);
     }
 
@@ -52,6 +70,7 @@ public class TeamService {
         if (!teamRepository.existsById(teamId)) {
             throw new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM);
         }
+
         teamRepository.deleteById(teamId);
     }
 
@@ -63,6 +82,7 @@ public class TeamService {
         User user = userService.getUserBySecurity();
 
         team.addUser(user);
+
         teamRepository.save(team);
     }
 

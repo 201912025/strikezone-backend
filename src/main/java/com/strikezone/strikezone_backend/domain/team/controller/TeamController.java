@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,19 +18,16 @@ public class TeamController {
 
     @GetMapping("/{teamId}")
     public ResponseEntity<TeamWithPlayerNamesResponseDTO> getTeamById(@PathVariable Long teamId) {
-        Team team = teamService.findTeamById(teamId);
+        TeamWithPlayerNamesResponseDTO teamDTO = teamService.findTeamByIdAsDTO(teamId);
 
-        return ResponseEntity.ok(TeamWithPlayerNamesResponseDTO.from(team));
+        return ResponseEntity.ok(teamDTO);
     }
 
     @GetMapping
     public ResponseEntity<List<TeamWithPlayerNamesResponseDTO>> getAllTeams() {
-        List<Team> teams = teamService.findAllTeams();
+        List<TeamWithPlayerNamesResponseDTO> teams = teamService.findAllTeamsAsDTO();
 
-        List<TeamWithPlayerNamesResponseDTO> teamWithPlayerNamesResponseDTOS = teams.stream()
-                .map(TeamWithPlayerNamesResponseDTO::from).collect(Collectors.toList());
-
-        return ResponseEntity.ok(teamWithPlayerNamesResponseDTOS);
+        return ResponseEntity.ok(teams);
     }
 
     @DeleteMapping("/{teamId}")
