@@ -35,12 +35,22 @@ public class Player extends BaseEntity{
         this.number = number;
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
+    public void changeTeam(Team newTeam) {
+        if (this.team != newTeam) {
+            this.team = newTeam;
+        }
     }
 
-    public void setNumber(Integer number) {
-        this.number = number;
+    public void changePosition(String newPosition) {
+        if (this.position != newPosition) {
+            this.position = newPosition;
+        }
+    }
+
+    public void changeNumber(Integer newNumber) {
+        if (this.number != newNumber) {
+            this.number = newNumber;
+        }
     }
 
 }

@@ -1,7 +1,9 @@
 package com.strikezone.strikezone_backend.domain.player.service;
 
 import com.strikezone.strikezone_backend.domain.player.dto.response.CreatePlayerResponseDTO;
+import com.strikezone.strikezone_backend.domain.player.dto.response.UpdatePlayerResponseDTO;
 import com.strikezone.strikezone_backend.domain.player.dto.service.CreatePlayerRequestServiceDTO;
+import com.strikezone.strikezone_backend.domain.player.dto.service.UpdatePlayerRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.player.entity.Player;
 import com.strikezone.strikezone_backend.domain.player.repository.PlayerRepository;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -80,4 +84,67 @@ class PlayerServiceTest {
 
         verify(playerRepository, times(1)).save(any(Player.class));
     }
+
+    @Test
+    @DisplayName("선수 업데이트 시 변경된 정보만 반영되고 기존 값은 유지된다.")
+    void updatePlayer() {
+        // given
+        Long playerId = 1L;
+
+        Team existingTeam = Team.builder()
+                                .name(TeamName.KIA)
+                                .build();
+
+        Player existingPlayer = Player.builder()
+                                      .name("김도영")
+                                      .team(existingTeam)
+                                      .position("3루수")
+                                      .number(5)
+                                      .build();
+
+        UpdatePlayerRequestServiceDTO updatePlayerRequestServiceDTO = UpdatePlayerRequestServiceDTO.builder()
+                                                                                                   .playerId(playerId)
+                                                                                                   .position("2루수")
+                                                                                                   .build();
+
+        UpdatePlayerResponseDTO expectedResponse = UpdatePlayerResponseDTO.builder()
+                                                                          .playerId(playerId)
+                                                                          .name(existingPlayer.getName())
+                                                                          .teamName(existingPlayer.getTeam().getName().toString())
+                                                                          .position("2루수")
+                                                                          .number(existingPlayer.getNumber())
+                                                                          .build();
+
+        // 모의 객체 설정
+        when(playerRepository.findById(playerId)).thenReturn(Optional.of(existingPlayer));
+        when(teamService.findByTeamName(anyString())).thenReturn(existingTeam);
+
+        when(playerRepository.save(any(Player.class))).thenAnswer(invocation -> {
+            Player savedPlayer = invocation.getArgument(0);  // 저장된 player 객체
+            return Player.builder()
+                         .name(savedPlayer.getName())
+                         .team(savedPlayer.getTeam())
+                         .position(savedPlayer.getPosition())
+                         .number(savedPlayer.getNumber())
+                         .build();
+        });
+
+
+        // when
+        UpdatePlayerResponseDTO actualResponse = playerService.updatePlayer(updatePlayerRequestServiceDTO);
+
+        // then
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.getPlayerId(), actualResponse.getPlayerId());
+        assertEquals(expectedResponse.getName(), actualResponse.getName());
+        assertEquals(expectedResponse.getTeamName(), actualResponse.getTeamName());
+        assertEquals(expectedResponse.getPosition(), actualResponse.getPosition());
+        assertEquals(expectedResponse.getNumber(), actualResponse.getNumber());
+
+        verify(playerRepository, times(1)).findById(playerId);
+        verify(teamService, times(1)).findByTeamName(anyString());
+        verify(playerRepository, times(1)).save(any(Player.class));
+    }
+
+
 }

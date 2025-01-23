@@ -32,18 +32,4 @@ public class Team {
         this.name = name;
     }
 
-    public void addUser(User user) {
-        if (user != null) {
-            this.users.add(user);
-            user.setTeam(this);
-        }
-    }
-
-    public void addPlayer(Player player) {
-        if (player != null) {
-            players.add(player);
-            player.setTeam(this);
-        }
-    }
-
 }
