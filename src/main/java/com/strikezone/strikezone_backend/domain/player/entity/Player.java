@@ -8,7 +8,6 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "players")
 public class Player extends BaseEntity{
 
     @Builder
@@ -17,7 +16,6 @@ public class Player extends BaseEntity{
         this.team = team;
         this.position = position;
         this.number = number;
-        this.photoUrl = photoUrl;
     }
 
     @Id
@@ -37,9 +35,6 @@ public class Player extends BaseEntity{
     @Column(nullable = false, length = 3)
     private Integer number;
 
-    @Column(length = 255)
-    private String photoUrl;
-
     public void setTeam(Team team) {
         this.team = team;
     }
@@ -47,8 +42,5 @@ public class Player extends BaseEntity{
     public void setNumber(Integer number) {
         this.number = number;
     }
-
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
+    
 }
