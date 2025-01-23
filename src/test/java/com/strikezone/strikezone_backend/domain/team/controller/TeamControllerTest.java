@@ -1,9 +1,10 @@
 package com.strikezone.strikezone_backend.domain.team.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.strikezone.strikezone_backend.domain.team.dto.controller.response.TeamWithPlayerNamesResponseDTO;
-import com.strikezone.strikezone_backend.domain.team.entity.Team;
-import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
+import com.strikezone.strikezone_backend.domain.team.dto.controller.request.CreateTeamRequestDTO;
+import com.strikezone.strikezone_backend.domain.team.dto.response.CreateTeamResponseDTO;
+import com.strikezone.strikezone_backend.domain.team.dto.response.TeamWithPlayerNamesResponseDTO;
+import com.strikezone.strikezone_backend.domain.team.dto.service.CreateTeamRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,31 @@ class TeamControllerTest {
                 .andExpect(jsonPath("$[1].playersNames").isEmpty());
     }
 
+    @Test
+    @DisplayName("팀을 생성하고 201 Created 상태 코드와 생성된 팀 정보를 반환한다.")
+    @WithMockUser(value = "kim", roles = "USERS")
+    void createTeam() throws Exception {
+        CreateTeamRequestDTO requestDTO = CreateTeamRequestDTO.builder()
+                .teamName("두산")
+                .build();
+
+        CreateTeamResponseDTO responseDTO = CreateTeamResponseDTO.builder()
+                .teamId(1L)
+                .teamName("두산")
+                .build();
+
+        when(teamService.createTeam(any(CreateTeamRequestServiceDTO.class))).thenReturn(responseDTO);
+
+        mockMvc.perform(post("/api/teams/{teamId}", 1L)  // URL에서 teamId는 PathVariable로 전달됨
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isCreated()) // 201 Created 상태 코드 확인
+                .andExpect(header().string("Location", "/api/teams/1")) // Location 헤더 확인
+                .andExpect(jsonPath("$.teamId").value(responseDTO.getTeamId())) // 응답 본문에서 teamId 확인
+                .andExpect(jsonPath("$.teamName").value(responseDTO.getTeamName())); // 응답 본문에서 teamName 확인
+
+        verify(teamService, times(1)).createTeam(any(CreateTeamRequestServiceDTO.class));
+    }
 
     @Test
     @DisplayName("특정 팀 삭제시 No Content 상태 코드가 반환된다.")
@@ -95,6 +121,5 @@ class TeamControllerTest {
 
         verify(teamService, times(1)).deleteTeamById(teamId);
     }
-
 
 }

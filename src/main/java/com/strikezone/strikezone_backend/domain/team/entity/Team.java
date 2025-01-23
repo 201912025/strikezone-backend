@@ -11,13 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "teams")
 public class Team {
-
-    @Builder
-    public Team(TeamName name) {
-        this.name = name;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +26,11 @@ public class Team {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TeamName name;
+
+    @Builder
+    public Team(TeamName name) {
+        this.name = name;
+    }
 
     public void addUser(User user) {
         if (user != null) {

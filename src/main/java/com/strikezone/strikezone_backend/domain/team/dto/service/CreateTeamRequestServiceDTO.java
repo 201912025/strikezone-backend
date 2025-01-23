@@ -4,13 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class CreateTeamServiceDTO {
+public class CreateTeamRequestServiceDTO {
+
+    private Long teamId;
 
     private String teamName;
 
     @Builder
-    public CreateTeamServiceDTO(String teamName) {
+    public CreateTeamRequestServiceDTO(Long teamId, String teamName) {
+        this.teamId = teamId;
         this.teamName = teamName;
     }
-    
+
 }

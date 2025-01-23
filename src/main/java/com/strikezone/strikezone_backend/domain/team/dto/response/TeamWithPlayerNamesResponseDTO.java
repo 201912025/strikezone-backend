@@ -1,4 +1,4 @@
-package com.strikezone.strikezone_backend.domain.team.dto.controller.response;
+package com.strikezone.strikezone_backend.domain.team.dto.response;
 
 import com.strikezone.strikezone_backend.domain.player.dto.response.PlayerNameResponseDTO;
 import com.strikezone.strikezone_backend.domain.player.entity.Player;
