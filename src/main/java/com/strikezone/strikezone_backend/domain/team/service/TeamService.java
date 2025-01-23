@@ -35,6 +35,18 @@ public class TeamService {
         return team;
     }
 
+    public Team findByTeamName(String teamName) {
+        TeamName teamNameEnum;
+        try {
+            teamNameEnum = TeamName.valueOf(teamName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(TeamExceptionType.INVALID_TEAM_NAME);
+        }
+
+        return teamRepository.findByName(teamNameEnum)
+                .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
+    }
+
     public List<TeamWithPlayerNamesResponseDTO> findAllTeamsAsDTO() {
         List<Team> teams = teamRepository.findAllTeamsWithPlayers();
 
