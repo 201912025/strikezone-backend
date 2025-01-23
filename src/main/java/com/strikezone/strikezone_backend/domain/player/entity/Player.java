@@ -42,5 +42,5 @@ public class Player extends BaseEntity{
     public void setNumber(Integer number) {
         this.number = number;
     }
-    
+
 }
