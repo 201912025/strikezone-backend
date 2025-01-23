@@ -10,14 +10,6 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Player extends BaseEntity{
 
-    @Builder
-    public Player(String name, Team team, String position, Integer number, String photoUrl) {
-        this.name = name;
-        this.team = team;
-        this.position = position;
-        this.number = number;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long playerId;
@@ -34,6 +26,14 @@ public class Player extends BaseEntity{
 
     @Column(nullable = false, length = 3)
     private Integer number;
+
+    @Builder
+    public Player(String name, Team team, String position, Integer number, String photoUrl) {
+        this.name = name;
+        this.team = team;
+        this.position = position;
+        this.number = number;
+    }
 
     public void setTeam(Team team) {
         this.team = team;
