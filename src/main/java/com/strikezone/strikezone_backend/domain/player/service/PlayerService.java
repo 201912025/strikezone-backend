@@ -8,6 +8,7 @@ import com.strikezone.strikezone_backend.domain.player.entity.Player;
 import com.strikezone.strikezone_backend.domain.player.exception.PlayerExceptionType;
 import com.strikezone.strikezone_backend.domain.player.repository.PlayerRepository;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
+import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -52,29 +53,18 @@ public class PlayerService {
         Player player = playerRepository.findById(updatePlayerRequestDTO.getPlayerId())
                                         .orElseThrow(() -> new NotFoundException(PlayerExceptionType.NOT_FOUND_PLAYER));
 
-        Team team = null;
-        if (updatePlayerRequestDTO.getTeamName() != null && !updatePlayerRequestDTO.getTeamName().isEmpty()) {
-            team = teamService.findByTeamName(updatePlayerRequestDTO.getTeamName());
-        }
+        Team team = teamService.findByTeamName(updatePlayerRequestDTO.getTeamName());
 
-        if (updatePlayerRequestDTO.getNumber() != null) {
-            player.changeNumber(updatePlayerRequestDTO.getNumber());
-        }
-        if (updatePlayerRequestDTO.getPosition() != null) {
-            player.changePosition(updatePlayerRequestDTO.getPosition());
-        }
-        if (team != null) {
-            player.changeTeam(team);
-        }
-
-        playerRepository.save(player);
+        player.changeTeam(team);
+        player.changeNumber(updatePlayerRequestDTO.getNumber());
+        player.changePosition(updatePlayerRequestDTO.getPosition());
 
         return UpdatePlayerResponseDTO.builder()
-                                      .playerId(player.getPlayerId())
-                                      .name(player.getName())
-                                      .teamName(player.getTeam().getName().toString())
-                                      .position(player.getPosition())
-                                      .number(player.getNumber())
+                                      .playerId(updatePlayerRequestDTO.getPlayerId())
+                                      .name(updatePlayerRequestDTO.getName())
+                                      .teamName(updatePlayerRequestDTO.getTeamName())
+                                      .position(updatePlayerRequestDTO.getPosition())
+                                      .number(updatePlayerRequestDTO.getNumber())
                                       .build();
     }
 
