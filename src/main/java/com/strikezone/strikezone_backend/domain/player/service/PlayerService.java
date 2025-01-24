@@ -1,6 +1,7 @@
 package com.strikezone.strikezone_backend.domain.player.service;
 
 import com.strikezone.strikezone_backend.domain.player.dto.response.CreatePlayerResponseDTO;
+import com.strikezone.strikezone_backend.domain.player.dto.response.PlayerResponseDTO;
 import com.strikezone.strikezone_backend.domain.player.dto.response.UpdatePlayerResponseDTO;
 import com.strikezone.strikezone_backend.domain.player.dto.service.CreatePlayerRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.player.dto.service.UpdatePlayerRequestServiceDTO;
@@ -66,6 +67,20 @@ public class PlayerService {
                                       .position(updatePlayerRequestDTO.getPosition())
                                       .number(updatePlayerRequestDTO.getNumber())
                                       .build();
+    }
+
+    public PlayerResponseDTO getPlayer(Long playerId) {
+        Player player = playerRepository.findByIdWithTeam(playerId)
+                                        .orElseThrow(() -> new NotFoundException(PlayerExceptionType.NOT_FOUND_PLAYER));
+
+        return PlayerResponseDTO.builder()
+                .playerId(player.getPlayerId())
+                .teamName(player.getTeam().getName().name())
+                .name(player.getName())
+                .position(player.getPosition())
+                .number(player.getNumber())
+                .build();
+
     }
 
 }
