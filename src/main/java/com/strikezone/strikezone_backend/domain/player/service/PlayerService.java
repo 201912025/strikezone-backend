@@ -9,7 +9,6 @@ import com.strikezone.strikezone_backend.domain.player.entity.Player;
 import com.strikezone.strikezone_backend.domain.player.exception.PlayerExceptionType;
 import com.strikezone.strikezone_backend.domain.player.repository.PlayerRepository;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
-import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
