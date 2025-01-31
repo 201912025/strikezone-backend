@@ -8,6 +8,7 @@ import com.strikezone.strikezone_backend.domain.player.dto.response.UpdatePlayer
 import com.strikezone.strikezone_backend.domain.player.dto.service.CreatePlayerRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.player.dto.service.UpdatePlayerRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.player.service.PlayerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class PlayerController {
     private final PlayerService playerService;
 
     @PostMapping
-    public ResponseEntity<CreatePlayerResponseDTO> createPlayer(@RequestBody CreatePlayerRequestDTO createPlayerRequestDTO) {
+    public ResponseEntity<CreatePlayerResponseDTO> createPlayer(@Valid @RequestBody CreatePlayerRequestDTO createPlayerRequestDTO) {
         CreatePlayerRequestServiceDTO serviceDTO = CreatePlayerRequestServiceDTO.builder()
                                                                                 .name(createPlayerRequestDTO.getName())
                                                                                 .teamName(createPlayerRequestDTO.getTeamName())
@@ -35,7 +36,7 @@ public class PlayerController {
 
     @PatchMapping("/{playerId}")
     public ResponseEntity<UpdatePlayerResponseDTO> updatePlayer(@PathVariable Long playerId,
-                                                                @RequestBody UpdatePlayerRequestDTO updatePlayerRequestDTO) {
+                                                                @Valid @RequestBody UpdatePlayerRequestDTO updatePlayerRequestDTO) {
         UpdatePlayerRequestServiceDTO serviceDTO = UpdatePlayerRequestServiceDTO.builder()
                                                                                 .playerId(playerId)
                                                                                 .name(updatePlayerRequestDTO.getName())
