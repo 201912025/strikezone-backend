@@ -1,5 +1,6 @@
 package com.strikezone.strikezone_backend.domain.player.dto.response;
 
+import com.strikezone.strikezone_backend.domain.player.entity.Player;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,4 +21,15 @@ public class PlayerResponseDTO {
         this.position = position;
         this.number = number;
     }
+
+    public static PlayerResponseDTO from(Player player) {
+        return PlayerResponseDTO.builder()
+                                .playerId(player.getPlayerId())
+                                .name(player.getName())
+                                .teamName(player.getTeam().toString())
+                                .position(player.getPosition())
+                                .number(player.getNumber())
+                                .build();
+    }
+
 }

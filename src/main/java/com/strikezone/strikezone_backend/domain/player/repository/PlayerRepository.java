@@ -12,7 +12,7 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     @Query("SELECT p FROM Player p JOIN FETCH p.team WHERE p.id = :playerId")
     Optional<Player> findByIdWithTeam(Long playerId);
 
-    @Query("SELECT p FROM Player p JOIN FETCH p.team WHERE p.id = :playerId")
-    List<Player> findPlayersWithTeamById(Long playerId);
+    @Query("SELECT p FROM Player p JOIN FETCH p.team")
+    List<Player> findAllWithTeam();
 
 }

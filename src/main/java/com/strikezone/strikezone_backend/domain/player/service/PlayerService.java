@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -80,6 +82,14 @@ public class PlayerService {
                 .number(player.getNumber())
                 .build();
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<PlayerResponseDTO> getAllPlayersWithTeam() {
+        List<Player> players = playerRepository.findAllWithTeam();
+        return players.stream()
+                      .map(PlayerResponseDTO::from)
+                      .toList();
     }
 
 }
