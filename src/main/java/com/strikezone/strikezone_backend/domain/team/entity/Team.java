@@ -1,6 +1,7 @@
 package com.strikezone.strikezone_backend.domain.team.entity;
 
 import com.strikezone.strikezone_backend.domain.player.entity.Player;
+import com.strikezone.strikezone_backend.domain.post.entity.Post;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,11 +18,14 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long teamId;
 
-    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "team")
     private List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "team")
     private List<Player> players = new ArrayList<>();
+
+    @OneToMany(mappedBy = "team")
+    private List<Post> posts = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

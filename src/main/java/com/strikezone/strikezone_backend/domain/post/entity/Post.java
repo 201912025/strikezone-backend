@@ -30,7 +30,6 @@ public class Post extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @Lob
     @Column(nullable = false)
     private String content;
 
@@ -40,25 +39,23 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private Integer likes = 0;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public Post(User user, Team team, String title, String content) {
-        this.user = user;
-        this.team = team;
+    public Post(String title, String content) {
         this.title = title;
         this.content = content;
     }
 
-    // 연관관계 편의 메서드
-    public void addComment(Comment comment) {
-        this.comments.add(comment);
-        comment.setPost(this);
+    public void addUser(User user) {
+        this.user = user;
+        user.getPosts().add(this);
     }
 
-    public void removeComment(Comment comment) {
-        this.comments.remove(comment);
-        comment.setPost(null);
+    public void addTeam(Team team) {
+        this.team = team;
+        team.getPosts().add(this);
     }
+
 }
