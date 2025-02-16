@@ -13,16 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "posts")
 public class Post extends BaseEntity {
-
-    @Builder
-    public Post(User user, Team team, String title, String content) {
-        this.user = user;
-        this.team = team;
-        this.title = title;
-        this.content = content;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,6 +42,14 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
+
+    @Builder
+    public Post(User user, Team team, String title, String content) {
+        this.user = user;
+        this.team = team;
+        this.title = title;
+        this.content = content;
+    }
 
     // 연관관계 편의 메서드
     public void addComment(Comment comment) {
