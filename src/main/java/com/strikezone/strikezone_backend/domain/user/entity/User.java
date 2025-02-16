@@ -11,18 +11,6 @@ import lombok.*;
 @Table(name = "users")
 public class User extends BaseEntity {
 
-    @Builder
-    public User(String username, String email, String password, String role, String gender, String birthDay, String bio, Team team) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.gender = gender;
-        this.birthDay = birthDay;
-        this.bio = bio;
-        this.team = team;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -46,6 +34,18 @@ public class User extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+
+    @Builder
+    public User(String username, String email, String password, String role, String gender, String birthDay, String bio, Team team) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.gender = gender;
+        this.birthDay = birthDay;
+        this.bio = bio;
+        this.team = team;
+    }
 
     public void setBio(String bio) {
         this.bio = bio;

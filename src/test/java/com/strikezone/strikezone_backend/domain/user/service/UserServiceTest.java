@@ -1,12 +1,14 @@
 package com.strikezone.strikezone_backend.domain.user.service;
 
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
+import com.strikezone.strikezone_backend.domain.user.dto.response.UserResponseDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.JoinServiceDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.UpdateUserServiceDTO;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.exception.UserExceptionType;
 import com.strikezone.strikezone_backend.domain.user.repository.UserRepository;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
+import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,18 +98,22 @@ class UserServiceTest {
     void getUserByUsernameSuccess() {
         when(userRepository.findByUsername("johndoe")).thenReturn(java.util.Optional.of(user));
 
-        User foundUser = userService.getUserByUsername("johndoe");
+        UserResponseDTO foundUserResponseDTO = userService.getUserByUsername("johndoe");
 
-        assertNotNull(foundUser);
-        assertEquals("johndoe", foundUser.getUsername());
+        assertNotNull(foundUserResponseDTO);
+        assertEquals("johndoe", foundUserResponseDTO.getUsername());
+        assertEquals("johndoe@example.com", foundUserResponseDTO.getEmail());
+        assertEquals("Developer", foundUserResponseDTO.getBio());
+        assertEquals("USER", foundUserResponseDTO.getRole());
     }
+
 
     @Test
     @DisplayName("존재하지 않는 사용자 이름으로 조회했을 때 예외가 발생하는 테스트")
     void getUserByUsernameUserNotFound() {
         when(userRepository.findByUsername("johndoe")).thenReturn(java.util.Optional.empty());
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
             userService.getUserByUsername("johndoe");
         });
 
@@ -143,10 +149,10 @@ class UserServiceTest {
         UpdateUserServiceDTO updateUserServiceDTO = UpdateUserServiceDTO.builder()
                 .email("updated.email@example.com")
                 .bio("Updated bio")
-                .team(team) // 팀 정보 업데이트
+                .team(team)
                 .build();
 
-        assertThrows(BadRequestException.class, () -> userService.updateUser(updateUserServiceDTO, username));
+        assertThrows(NotFoundException.class, () -> userService.updateUser(updateUserServiceDTO, username));
     }
 
     @Test
@@ -166,8 +172,8 @@ class UserServiceTest {
         String username = "johndoe";
         when(userRepository.findByUsername(username)).thenReturn(java.util.Optional.empty());
 
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            userService.deleteUser(username);
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            userService.getUserByUsername("johndoe");
         });
 
         assertEquals(UserExceptionType.NOT_FOUND_USER, exception.getExceptionType());

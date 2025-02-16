@@ -3,6 +3,7 @@ package com.strikezone.strikezone_backend.domain.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.strikezone.strikezone_backend.domain.user.dto.controller.JoinControllerDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.controller.UpdateUserControllerDTO;
+import com.strikezone.strikezone_backend.domain.user.dto.response.UserResponseDTO;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,7 @@ class UserControllerTest {
 
     private JoinControllerDTO joinControllerDTO;
     private UpdateUserControllerDTO updateUserControllerDTO;
-    private User user;
+    private UserResponseDTO userResponseDTO;
 
     @BeforeEach
     void setUp() {
@@ -53,14 +54,15 @@ class UserControllerTest {
                 .team(null)
                 .build();
 
-        user = User.builder()
-                .username("johndoe")
-                .password("encodedpassword")
-                .email("johndoe@example.com")
-                .role("USER")
-                .bio("Developer")
-                .team(null)
-                .build();
+        userResponseDTO = UserResponseDTO.builder()
+                                         .username("johndoe")
+                                         .email("johndoe@example.com")
+                                         .role("USER")
+                                         .gender(null)
+                                         .birthDay(null)
+                                         .bio("Developer")
+                                         .teamName(null)  // 예시로 null로 설정
+                                         .build();
     }
 
     @Test
@@ -78,13 +80,16 @@ class UserControllerTest {
 
     @Test
     @DisplayName("내 사용자 정보를 조회할 때 성공하는 테스트")
-    @WithMockUser(username = "johndoe", roles = "USER")  // 인증된 사용자 설정
+    @WithMockUser(username = "johndoe", roles = "USER")
     void getMyUserInfo() throws Exception {
-        when(userService.getUserByUsername("johndoe")).thenReturn(user);
+        when(userService.getUserByUsername("johndoe")).thenReturn(userResponseDTO);
 
         mockMvc.perform(get("/api/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("johndoe"));
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.username").value("johndoe"))
+               .andExpect(jsonPath("$.teamName").value((Object) null))
+               .andExpect(jsonPath("$.email").value("johndoe@example.com"))
+               .andExpect(jsonPath("$.bio").value("Developer"));
 
         verify(userService, times(1)).getUserByUsername("johndoe");
     }

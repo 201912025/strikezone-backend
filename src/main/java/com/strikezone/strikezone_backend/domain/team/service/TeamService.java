@@ -7,7 +7,6 @@ import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
 import com.strikezone.strikezone_backend.domain.team.repository.TeamRepository;
-import com.strikezone.strikezone_backend.domain.user.service.UserService;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 public class TeamService {
 
     private final TeamRepository teamRepository;
-    private final UserService userService;
+
     public List<Team> findAllTeams() {
         return teamRepository.findAll();
     }

@@ -2,8 +2,8 @@ package com.strikezone.strikezone_backend.domain.user.controller;
 
 import com.strikezone.strikezone_backend.domain.user.dto.controller.JoinControllerDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.controller.UpdateUserControllerDTO;
+import com.strikezone.strikezone_backend.domain.user.dto.response.UserResponseDTO;
 import com.strikezone.strikezone_backend.domain.user.service.UserService;
-import com.strikezone.strikezone_backend.domain.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +25,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<User> getMyUserInfo() {
+    public ResponseEntity<UserResponseDTO> getMyUserInfo() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+        UserResponseDTO userResponseDTO = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userResponseDTO);
     }
 
     @PostMapping("/update")

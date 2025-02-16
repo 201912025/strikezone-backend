@@ -1,5 +1,6 @@
 package com.strikezone.strikezone_backend.domain.user.service;
 
+import com.strikezone.strikezone_backend.domain.user.dto.response.UserResponseDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.JoinServiceDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.UpdateUserServiceDTO;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
@@ -50,11 +51,22 @@ public class UserService {
         }
     }
 
-    public User getUserByUsername(String username) {
+    public UserResponseDTO getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserExceptionType.NOT_FOUND_USER));
 
-        return user;
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .birthDay((user.getBirthDay()))
+                .bio(user.getBio())
+                .teamName(user.getTeam().toString())
+                .build();
+
+        return userResponseDTO;
     }
 
     @Transactional
