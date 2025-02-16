@@ -8,12 +8,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +28,13 @@ public class PostController {
         URI location = URI.create("/api/posts/" + postResponseDTO.getPostId());
 
         return ResponseEntity.created(location).body(postResponseDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PostResponseDTO>> getPosts() {
+        List<PostResponseDTO> postResponseDTOS = postService.getPosts();
+
+        return ResponseEntity.ok(postResponseDTOS);
     }
 
 }

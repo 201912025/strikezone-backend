@@ -1,6 +1,7 @@
 package com.strikezone.strikezone_backend.domain.post.dto.response;
 
 import com.strikezone.strikezone_backend.domain.post.entity.Post;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -17,17 +18,29 @@ public class PostResponseDTO {
     private Integer views;
     private Integer likes;
 
-    public static PostResponseDTO fromEntity(Post post) {
-        PostResponseDTO dto = new PostResponseDTO();
-        dto.postId = post.getPostId();
-        dto.title = post.getTitle();
-        dto.content = post.getContent();
-        dto.teamName = post.getTeam() != null ? post.getTeam().toString() : null;
-        dto.username = post.getUser().getUsername();
-        dto.views = post.getViews();
-        dto.likes = post.getLikes();
-        return dto;
+    @Builder
+    public PostResponseDTO(Long postId, String title, String content, String teamName, String username, Integer views, Integer likes) {
+        this.postId = postId;
+        this.title = title;
+        this.content = content;
+        this.teamName = teamName;
+        this.username = username;
+        this.views = views;
+        this.likes = likes;
     }
+
+    public static PostResponseDTO fromEntity(Post post) {
+        return PostResponseDTO.builder()
+                              .postId(post.getPostId())
+                              .title(post.getTitle())
+                              .content(post.getContent())
+                              .teamName(post.getTeam() != null ? post.getTeam().toString() : null)
+                              .username(post.getUser().getUsername())
+                              .views(post.getViews())
+                              .likes(post.getLikes())
+                              .build();
+    }
+
 
     public static List<PostResponseDTO> fromEntities(List<Post> posts) {
         return posts.stream()
