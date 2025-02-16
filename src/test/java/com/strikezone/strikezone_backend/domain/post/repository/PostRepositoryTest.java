@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -58,4 +60,41 @@ public class PostRepositoryTest {
         // Then
         assertFalse(exists, "주어진 제목의 게시글이 존재하지 않아야 한다");
     }
+
+    @Test
+    @DisplayName("전체 게시글을 조회할 수 있어야 한다")
+    public void testFindAll() {
+        // Given
+        User user = User.builder()
+                        .username("testUser")
+                        .email("test@example.com")
+                        .password("password")
+                        .role("USER")
+                        .build();
+
+        user = userRepository.save(user);
+
+        Post post1 = Post.builder()
+                         .title("Post 1")
+                         .content("Content 1")
+                         .build();
+        post1.addUser(user);
+
+        Post post2 = Post.builder()
+                         .title("Post 2")
+                         .content("Content 2")
+                         .build();
+        post2.addUser(user);
+
+        postRepository.save(post1);
+        postRepository.save(post2);
+
+        // When
+        List<Post> posts = postRepository.findAll();
+
+        // Then
+        assertNotNull(posts, "게시글 리스트는 null이 아니어야 한다");
+        assertEquals(2, posts.size(), "전체 게시글 수가 2여야 한다");
+    }
+
 }

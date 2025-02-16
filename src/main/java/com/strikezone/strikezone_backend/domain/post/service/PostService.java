@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +46,10 @@ public class PostService {
         return PostResponseDTO.fromEntity(savedPost);
     }
 
+    public List<PostResponseDTO> getPosts() {
+        List<Post> posts = postRepository.findAll();
+
+        return PostResponseDTO.fromEntities(posts);
+    }
 
 }
