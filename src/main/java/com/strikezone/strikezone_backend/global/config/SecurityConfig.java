@@ -83,7 +83,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/api/user/join").permitAll()
+                        .requestMatchers("/login", "/", "/api/users/join").permitAll()
                         .anyRequest().authenticated());
 
         http

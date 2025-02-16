@@ -68,7 +68,7 @@ class UserControllerTest {
     void joinUser() throws Exception {
         doNothing().when(userService).joinUser(any());
 
-        mockMvc.perform(post("/api/user/join")
+        mockMvc.perform(post("/api/users/join")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(joinControllerDTO)))
                 .andExpect(status().isCreated());
@@ -82,7 +82,7 @@ class UserControllerTest {
     void getMyUserInfo() throws Exception {
         when(userService.getUserByUsername("johndoe")).thenReturn(user);
 
-        mockMvc.perform(get("/api/user"))
+        mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("johndoe"));
 
@@ -95,7 +95,7 @@ class UserControllerTest {
     void updateUser() throws Exception {
         doNothing().when(userService).updateUser(any(), any());
 
-        mockMvc.perform(post("/api/user/update")
+        mockMvc.perform(post("/api/users/update")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(updateUserControllerDTO)))
                 .andExpect(status().isNoContent());
@@ -109,7 +109,7 @@ class UserControllerTest {
     void deleteUser() throws Exception {
         doNothing().when(userService).deleteUser(any());
 
-        mockMvc.perform(post("/api/user/delete"))
+        mockMvc.perform(post("/api/users/delete"))
                 .andExpect(status().isNoContent());
 
         verify(userService, times(1)).deleteUser("johndoe");
