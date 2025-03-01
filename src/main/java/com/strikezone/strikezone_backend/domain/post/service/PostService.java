@@ -2,6 +2,7 @@ package com.strikezone.strikezone_backend.domain.post.service;
 
 import com.strikezone.strikezone_backend.domain.post.dto.response.PostResponseDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostRequestServiceDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.service.PostUpdateRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.entity.Post;
 import com.strikezone.strikezone_backend.domain.post.exception.PostExceptionType;
 import com.strikezone.strikezone_backend.domain.post.repository.PostRepository;
@@ -52,4 +53,47 @@ public class PostService {
         return PostResponseDTO.fromEntities(posts);
     }
 
+    public PostResponseDTO getPostById(Long postId) {
+        Post post = postRepository.findById(postId)
+                                  .orElseThrow(() -> new BadRequestException(PostExceptionType.NOT_FOUND_POST));
+        return PostResponseDTO.fromEntity(post);
+    }
+
+    @Transactional
+    public PostResponseDTO updatePost(PostUpdateRequestServiceDTO postUpdateRequestServiceDTO) {
+        Post post = postRepository.findById(postUpdateRequestServiceDTO.getPostId())
+                                  .orElseThrow(() -> new BadRequestException(PostExceptionType.NOT_FOUND_POST));
+
+        User currentUser = userService.getUserBySecurityUsername(postUpdateRequestServiceDTO.getUsername());
+        if (!post.getUser().getUserId().equals(currentUser.getUserId())) {
+            throw new BadRequestException(PostExceptionType.UNAUTHORIZED_USER);
+        }
+
+        validateTitle(postUpdateRequestServiceDTO.getTitle());
+        validateContent(postUpdateRequestServiceDTO.getContent());
+
+        if (post.getTitle().equals(postUpdateRequestServiceDTO.getTitle()) &&
+                post.getContent().equals(postUpdateRequestServiceDTO.getContent())) {
+            return PostResponseDTO.fromEntity(post);
+        }
+
+        post.update(postUpdateRequestServiceDTO.getTitle(), postUpdateRequestServiceDTO.getContent());
+
+        return PostResponseDTO.fromEntity(post);
+    }
+
+    private void validateTitle(String title) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new BadRequestException(PostExceptionType.INVALID_TITLE);
+        }
+        if (postRepository.existsByTitle(title)) {
+            throw new BadRequestException(PostExceptionType.DUPLICATED_TITLE);
+        }
+    }
+
+    private void validateContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new BadRequestException(PostExceptionType.INVALID_CONTENT);
+        }
+    }
 }

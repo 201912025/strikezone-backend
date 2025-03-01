@@ -58,4 +58,9 @@ public class Post extends BaseEntity {
         team.getPosts().add(this);
     }
 
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
 }
