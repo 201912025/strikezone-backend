@@ -33,17 +33,17 @@ public class JoinControllerDTO {
     @NotBlank(message = "소개글은 필수입니다.")
     private String bio;
 
-    private Team team;
+    private String teamName;
 
     @Builder
-    public JoinControllerDTO(String username, String password, String email, String gender, String birthDay, String bio, Team team) {
+    public JoinControllerDTO(String username, String password, String email, String gender, String birthDay, String bio, String teamName) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.gender = gender;
         this.birthDay = birthDay;
         this.bio = bio;
-        this.team = team;
+        this.teamName = teamName;
     }
 
     public JoinServiceDTO toServiceDTO() {
@@ -54,7 +54,7 @@ public class JoinControllerDTO {
                 .gender(this.gender)
                 .birthDay(this.birthDay)
                 .bio(this.bio)
-                .team(this.team)
+                .teamName(this.teamName)
                 .build();
     }
 }

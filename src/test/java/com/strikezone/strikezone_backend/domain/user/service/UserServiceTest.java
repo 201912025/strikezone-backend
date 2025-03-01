@@ -1,6 +1,7 @@
 package com.strikezone.strikezone_backend.domain.user.service;
 
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
+import com.strikezone.strikezone_backend.domain.team.service.TeamService;
 import com.strikezone.strikezone_backend.domain.user.dto.response.UserResponseDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.JoinServiceDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.UpdateUserServiceDTO;
@@ -35,6 +36,9 @@ class UserServiceTest {
     @Mock
     private Team team;
 
+    @Mock
+    private TeamService teamService;
+
     @InjectMocks
     private UserService userService;
 
@@ -50,7 +54,7 @@ class UserServiceTest {
                 .email("johndoe@example.com")
                 .role("USER")
                 .bio("Developer")
-                .team(team)
+                .teamName("KIA")
                 .build();
 
         updateUserServiceDTO = UpdateUserServiceDTO.builder()
@@ -74,12 +78,14 @@ class UserServiceTest {
     void joinUserSuccess() {
         when(userRepository.existsByUsername(joinServiceDTO.getUsername())).thenReturn(false);
         when(bCryptPasswordEncoder.encode(joinServiceDTO.getPassword())).thenReturn("encodedpassword");
+        when(teamService.findByTeamName(joinServiceDTO.getTeamName())).thenReturn(team);  // ✅ 추가
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         userService.joinUser(joinServiceDTO);
 
         verify(userRepository, times(1)).save(any(User.class));
     }
+
 
     @Test
     @DisplayName("이미 존재하는 사용자 이름으로 회원 가입을 시도했을 때 예외가 발생하는 테스트")

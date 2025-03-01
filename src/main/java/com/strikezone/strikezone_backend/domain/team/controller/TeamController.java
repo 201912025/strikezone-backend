@@ -33,10 +33,9 @@ public class TeamController {
         return ResponseEntity.ok(teams);
     }
 
-    @PostMapping("/{teamId}")
-    public ResponseEntity<CreateTeamResponseDTO> createTeam(@PathVariable Long teamId, @RequestBody CreateTeamRequestDTO createTeamRequestDTO) {
+    @PostMapping
+    public ResponseEntity<CreateTeamResponseDTO> createTeam(@RequestBody CreateTeamRequestDTO createTeamRequestDTO) {
         CreateTeamRequestServiceDTO serviceDTO = CreateTeamRequestServiceDTO.builder()
-                .teamId(teamId)
                 .teamName(createTeamRequestDTO.getTeamName())
                 .build();
 

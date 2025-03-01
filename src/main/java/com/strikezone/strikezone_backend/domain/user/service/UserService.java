@@ -1,5 +1,7 @@
 package com.strikezone.strikezone_backend.domain.user.service;
 
+import com.strikezone.strikezone_backend.domain.team.entity.Team;
+import com.strikezone.strikezone_backend.domain.team.service.TeamService;
 import com.strikezone.strikezone_backend.domain.user.dto.response.UserResponseDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.JoinServiceDTO;
 import com.strikezone.strikezone_backend.domain.user.dto.service.UpdateUserServiceDTO;
@@ -21,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-
+    private final TeamService teamService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
@@ -29,13 +31,15 @@ public class UserService {
 
         checkUsernameValid(joinServiceDTO.getUsername());
 
+        Team team = teamService.findByTeamName(joinServiceDTO.getTeamName());
+
         User user = User.builder()
                 .username(joinServiceDTO.getUsername())
                 .password((bCryptPasswordEncoder.encode(joinServiceDTO.getPassword())))
                 .role("USER")
                 .bio(joinServiceDTO.getBio())
                 .email(joinServiceDTO.getEmail())
-                .team(joinServiceDTO.getTeam())
+                .team(team)
                 .build();
 
         userRepository.save(user);

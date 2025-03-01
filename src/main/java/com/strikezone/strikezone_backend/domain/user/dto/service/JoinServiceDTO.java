@@ -1,6 +1,5 @@
 package com.strikezone.strikezone_backend.domain.user.dto.service;
 
-import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,10 +13,10 @@ public class JoinServiceDTO {
     private String gender;
     private String birthDay;
     private String bio;
-    private Team team;
+    private String teamName;
 
     @Builder
-    public JoinServiceDTO(String username, String password, String email, String role, String gender, String birthDay, String bio, Team team) {
+    public JoinServiceDTO(String username, String password, String email, String role, String gender, String birthDay, String bio, String teamName) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -25,6 +24,6 @@ public class JoinServiceDTO {
         this.gender = gender;
         this.birthDay = birthDay;
         this.bio = bio;
-        this.team = team;
+        this.teamName = teamName;
     }
 }

@@ -36,13 +36,17 @@ public class JWTUtil {
     }
 
     public String createJwt(String username, String role, Long expiredMs) {
+        if (expiredMs == null || expiredMs <= 0) {
+            expiredMs = 1000 * 60 * 60 * 1L; // 기본값: 1시간
+        }
 
         return Jwts.builder()
-                .claim("username", username)
-                .claim("role", role)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey)
-                .compact();
+                   .claim("username", username)
+                   .claim("role", role)
+                   .issuedAt(new Date(System.currentTimeMillis()))
+                   .expiration(new Date(System.currentTimeMillis() + expiredMs))
+                   .signWith(secretKey)
+                   .compact();
     }
+
 }

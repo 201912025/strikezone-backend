@@ -45,7 +45,7 @@ class UserControllerTest {
                 .password("password123")
                 .email("johndoe@example.com")
                 .bio("Developer")
-                .team(null)
+                .teamName("KIA")
                 .build();
 
         updateUserControllerDTO = UpdateUserControllerDTO.builder()
