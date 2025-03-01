@@ -11,4 +11,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Boolean existsByTitle(String title);
 
+    List<Post> findTop10ByOrderByViewsDescLikesDesc();
+
 }

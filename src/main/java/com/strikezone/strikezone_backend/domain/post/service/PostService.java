@@ -1,6 +1,7 @@
 package com.strikezone.strikezone_backend.domain.post.service;
 
 import com.strikezone.strikezone_backend.domain.post.dto.response.PostResponseDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.service.PostDeleteRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostUpdateRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.entity.Post;
@@ -95,5 +96,22 @@ public class PostService {
         if (content == null || content.trim().isEmpty()) {
             throw new BadRequestException(PostExceptionType.INVALID_CONTENT);
         }
+    }
+
+    @Transactional
+    public void deletePost(PostDeleteRequestServiceDTO postDeleteRequestServiceDTO) {
+        Post post = postRepository.findById(postDeleteRequestServiceDTO.getPostId())
+                                  .orElseThrow(() -> new BadRequestException(PostExceptionType.NOT_FOUND_POST));
+
+        User currentUser = userService.getUserBySecurityUsername(postDeleteRequestServiceDTO.getUsername());
+        if (!post.getUser().getUserId().equals(currentUser.getUserId())) {
+            throw new BadRequestException(PostExceptionType.UNAUTHORIZED_USER);
+        }
+        postRepository.delete(post);
+    }
+
+    public List<PostResponseDTO> getPopularPosts() {
+        List<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc();
+        return PostResponseDTO.fromEntities(popularPosts);
     }
 }

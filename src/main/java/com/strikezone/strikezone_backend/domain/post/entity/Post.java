@@ -63,4 +63,12 @@ public class Post extends BaseEntity {
         this.content = content;
     }
 
+    public void incrementViews() {
+        this.views += 1;
+    }
+
+    public void incrementLikes() {
+        this.likes += 1;
+    }
+
 }

@@ -3,6 +3,7 @@ package com.strikezone.strikezone_backend.domain.post.controller;
 import com.strikezone.strikezone_backend.domain.post.dto.controller.PostRequestDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.controller.PostUpdateRequestDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.response.PostResponseDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.service.PostDeleteRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostUpdateRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.service.PostService;
@@ -55,6 +56,26 @@ public class PostController {
         PostResponseDTO postResponseDTO = postService.updatePost(serviceDTO);
 
         return ResponseEntity.ok(postResponseDTO);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        PostDeleteRequestServiceDTO deleteRequestDTO = PostDeleteRequestServiceDTO.builder()
+                                                                                  .postId(postId)
+                                                                                  .username(username)
+                                                                                  .build();
+
+        postService.deletePost(deleteRequestDTO);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<List<PostResponseDTO>> getPopularPosts() {
+        List<PostResponseDTO> popularPosts = postService.getPopularPosts();
+        return ResponseEntity.ok(popularPosts);
     }
 
 }

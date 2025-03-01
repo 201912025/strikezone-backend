@@ -1,6 +1,7 @@
 package com.strikezone.strikezone_backend.domain.post.service;
 
 import com.strikezone.strikezone_backend.domain.post.dto.response.PostResponseDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.service.PostDeleteRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostUpdateRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.entity.Post;
@@ -18,7 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -178,6 +182,105 @@ public class PostServiceTest {
         assertEquals("Same Title", result.getTitle());
         assertEquals("Same Content", result.getContent());
         verify(postRepository, never()).save(any(Post.class)); // 업데이트가 발생하지 않았음을 검증
+    }
+
+    @Test
+    @DisplayName("게시글 삭제가 성공적으로 이루어져야 한다")
+    public void testDeletePost_Success() {
+        // Given
+        Long postId = 1L;
+        String username = "testUser";
+        PostDeleteRequestServiceDTO deleteDTO = new PostDeleteRequestServiceDTO(postId, username);
+
+        // 게시글 작성자와 요청 사용자가 동일하도록 생성
+        User user = User.builder().username(username).build();
+        ReflectionTestUtils.setField(user, "userId", 1L);
+
+        Post post = Post.builder().title("Test Title").content("Test Content").build();
+        post.addUser(user);
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userService.getUserBySecurityUsername(username)).thenReturn(user);
+
+        // When
+        postService.deletePost(deleteDTO);
+
+        // Then
+        verify(postRepository, times(1)).delete(post);
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 시 존재하지 않는 게시글이면 예외가 발생해야 한다")
+    public void testDeletePost_PostNotFound() {
+        // Given
+        Long postId = 1L;
+        String username = "testUser";
+        PostDeleteRequestServiceDTO deleteDTO = new PostDeleteRequestServiceDTO(postId, username);
+
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
+
+        // When / Then
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            postService.deletePost(deleteDTO);
+        });
+        assertEquals(PostExceptionType.NOT_FOUND_POST, exception.getExceptionType());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 시 작성자와 삭제 요청 사용자가 일치하지 않으면 예외가 발생해야 한다")
+    public void testDeletePost_UnauthorizedUser() {
+        // Given
+        Long postId = 1L;
+        String username = "otherUser";
+        PostDeleteRequestServiceDTO deleteDTO = new PostDeleteRequestServiceDTO(postId, username);
+
+        // 게시글의 실제 작성자는 "ownerUser"로 설정
+        User postOwner = User.builder().username("ownerUser").build();
+        ReflectionTestUtils.setField(postOwner, "userId", 1L);
+        // 요청하는 사용자
+        User currentUser = User.builder().username(username).build();
+        ReflectionTestUtils.setField(currentUser, "userId", 2L);
+
+        Post post = Post.builder().title("Test Title").content("Test Content").build();
+        post.addUser(postOwner);
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userService.getUserBySecurityUsername(username)).thenReturn(currentUser);
+
+        // When / Then
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            postService.deletePost(deleteDTO);
+        });
+        assertEquals(PostExceptionType.UNAUTHORIZED_USER, exception.getExceptionType());
+    }
+
+    // -------------------- getPopularPosts 관련 테스트 --------------------
+
+    @Test
+    @DisplayName("인기 게시글 조회 시 상위 10개 게시글을 반환해야 한다")
+    public void testGetPopularPosts() {
+        // Given
+        User dummyUser = User.builder().username("dummyUser").build();
+
+        ReflectionTestUtils.setField(dummyUser, "userId", 1L);
+
+        Post post1 = Post.builder().title("Title1").content("Content1").build();
+        Post post2 = Post.builder().title("Title2").content("Content2").build();
+        // 각 게시글에 유저를 추가
+        post1.addUser(dummyUser);
+        post2.addUser(dummyUser);
+
+        List<Post> popularPosts = Arrays.asList(post1, post2);
+        when(postRepository.findTop10ByOrderByViewsDescLikesDesc()).thenReturn(popularPosts);
+
+        // When
+        List<PostResponseDTO> responseList = postService.getPopularPosts();
+
+        // Then
+        assertNotNull(responseList);
+        assertEquals(2, responseList.size());
+        assertEquals("Title1", responseList.get(0).getTitle());
+        assertEquals("Title2", responseList.get(1).getTitle());
     }
 
 }
