@@ -78,4 +78,13 @@ public class PostController {
         return ResponseEntity.ok(popularPosts);
     }
 
+    @PatchMapping("/{postId}/like")
+    public ResponseEntity<Void> incrementLikes(@PathVariable Long postId) {
+        postService.incrementLikes(postId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 }

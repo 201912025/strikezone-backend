@@ -57,6 +57,7 @@ public class PostService {
     public PostResponseDTO getPostById(Long postId) {
         Post post = postRepository.findById(postId)
                                   .orElseThrow(() -> new BadRequestException(PostExceptionType.NOT_FOUND_POST));
+        post.incrementViews();
         return PostResponseDTO.fromEntity(post);
     }
 
@@ -114,4 +115,12 @@ public class PostService {
         List<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc();
         return PostResponseDTO.fromEntities(popularPosts);
     }
+
+    @Transactional
+    public void incrementLikes(Long postId) {
+        Post post = postRepository.findById(postId)
+                                  .orElseThrow(() -> new BadRequestException(PostExceptionType.NOT_FOUND_POST));
+        post.incrementLikes();
+    }
+
 }

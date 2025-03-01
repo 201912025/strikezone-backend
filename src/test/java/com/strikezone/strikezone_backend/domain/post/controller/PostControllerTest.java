@@ -9,6 +9,7 @@ import com.strikezone.strikezone_backend.domain.post.service.PostService;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -192,6 +193,21 @@ class PostControllerTest {
                .andExpect(jsonPath("$.content").value("Updated Content"));
 
         verify(postService, times(1)).updatePost(any());
+    }
+
+    @Test
+    @WithMockUser(value = "testUser", roles = "USER")
+    @DisplayName("좋아요 증가 컨트롤러 테스트: 204 No Content 반환")
+    public void testIncrementLikesEndpoint() throws Exception {
+        Long postId = 1L;
+        // postService.incrementLikes(postId)는 void이므로 doNothing() 사용
+        doNothing().when(postService).incrementLikes(postId);
+
+        mockMvc.perform(patch("/api/posts/{postId}/like", postId)
+                       .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isNoContent());
+
+        verify(postService, Mockito.times(1)).incrementLikes(postId);
     }
 
 }

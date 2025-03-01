@@ -254,8 +254,6 @@ public class PostServiceTest {
         assertEquals(PostExceptionType.UNAUTHORIZED_USER, exception.getExceptionType());
     }
 
-    // -------------------- getPopularPosts 관련 테스트 --------------------
-
     @Test
     @DisplayName("인기 게시글 조회 시 상위 10개 게시글을 반환해야 한다")
     public void testGetPopularPosts() {
@@ -281,6 +279,51 @@ public class PostServiceTest {
         assertEquals(2, responseList.size());
         assertEquals("Title1", responseList.get(0).getTitle());
         assertEquals("Title2", responseList.get(1).getTitle());
+    }
+
+    @Test
+    @DisplayName("게시글 상세 조회 시 조회수 자동 증가 테스트")
+    public void testGetPostById_IncrementViews() {
+        // Given
+        Long postId = 1L;
+        // spy로 생성하여 incrementViews() 호출 여부 검증
+        Post post = spy(Post.builder().title("Test Title").content("Test Content").build());
+        // 초기 조회수 5로 설정
+        ReflectionTestUtils.setField(post, "views", 5);
+        User user = User.builder().username("testUser").build();
+        ReflectionTestUtils.setField(user, "userId", 1L);
+        post.addUser(user);
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+        // When
+        PostResponseDTO responseDTO = postService.getPostById(postId);
+
+        // Then: 조회수 증가 호출 확인 및 값 검증 (5 -> 6)
+        verify(post, times(1)).incrementViews();
+        assertNotNull(responseDTO);
+        assertEquals(6, responseDTO.getViews(), "조회수는 1 증가해야 합니다.");
+    }
+
+    @Test
+    @DisplayName("좋아요 증가 메서드 테스트 (void 메서드)")
+    public void testIncrementLikes() {
+        // Given
+        Long postId = 1L;
+        Post post = spy(Post.builder().title("Test Title").content("Test Content").build());
+        // 초기 좋아요 수 3으로 설정
+        ReflectionTestUtils.setField(post, "likes", 3);
+        User user = User.builder().username("testUser").build();
+        ReflectionTestUtils.setField(user, "userId", 1L);
+        post.addUser(user);
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+        // When
+        postService.incrementLikes(postId);
+
+        // Then: 좋아요 증가 호출 여부와 최종 값 (3 -> 4) 검증
+        verify(post, times(1)).incrementLikes();
+        assertEquals(4, post.getLikes(), "좋아요 수는 1 증가해야 합니다.");
     }
 
 }
