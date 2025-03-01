@@ -1,8 +1,10 @@
 package com.strikezone.strikezone_backend.domain.post.controller;
 
 import com.strikezone.strikezone_backend.domain.post.dto.controller.PostRequestDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.controller.PostUpdateRequestDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.response.PostResponseDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.service.PostRequestServiceDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.service.PostUpdateRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,24 @@ public class PostController {
         List<PostResponseDTO> postResponseDTOS = postService.getPosts();
 
         return ResponseEntity.ok(postResponseDTOS);
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable Long postId) {
+        PostResponseDTO post = postService.getPostById(postId);
+
+        return ResponseEntity.ok(post);
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO> updatePost(@PathVariable Long postId,
+                                        @RequestBody PostUpdateRequestDTO updateRequest) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        PostUpdateRequestServiceDTO serviceDTO = PostUpdateRequestServiceDTO.from(updateRequest, postId, username);
+
+        PostResponseDTO postResponseDTO = postService.updatePost(serviceDTO);
+
+        return ResponseEntity.ok(postResponseDTO);
     }
 
 }

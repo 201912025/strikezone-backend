@@ -2,6 +2,7 @@ package com.strikezone.strikezone_backend.domain.post.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.strikezone.strikezone_backend.domain.post.dto.controller.PostRequestDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.controller.PostUpdateRequestDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.response.PostResponseDTO;
 import com.strikezone.strikezone_backend.domain.post.exception.PostExceptionType;
 import com.strikezone.strikezone_backend.domain.post.service.PostService;
@@ -130,4 +131,67 @@ class PostControllerTest {
 
         verify(postService, times(1)).getPosts();
     }
+
+    @Test
+    @DisplayName("게시글 ID로 조회하면 PostResponseDTO를 반환해야 한다")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testGetPostById() throws Exception {
+        // Given
+        PostResponseDTO postResponseDTO = PostResponseDTO.builder()
+                                                         .postId(1L)
+                                                         .title("Test Title")
+                                                         .content("Test Content")
+                                                         .teamName("testTeam")
+                                                         .username("testUser")
+                                                         .views(0)
+                                                         .likes(0)
+                                                         .build();
+
+        when(postService.getPostById(1L)).thenReturn(postResponseDTO);
+
+        // When / Then
+        mockMvc.perform(get("/api/posts/{postId}", 1L))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.postId").value(1L))
+               .andExpect(jsonPath("$.title").value("Test Title"))
+               .andExpect(jsonPath("$.content").value("Test Content"));
+
+        verify(postService, times(1)).getPostById(1L);
+    }
+
+    @Test
+    @DisplayName("게시글 업데이트 요청(PATCH) 시 업데이트된 PostResponseDTO를 반환해야 한다")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testUpdatePost() throws Exception {
+        // Given
+        Long postId = 1L;
+        PostUpdateRequestDTO updateRequestDTO = PostUpdateRequestDTO.builder()
+                                                                    .title("Updated Title")
+                                                                    .content("Updated Content")
+                                                                    .build();
+
+        PostResponseDTO postResponseDTO = PostResponseDTO.builder()
+                                                         .postId(postId)
+                                                         .title("Updated Title")
+                                                         .content("Updated Content")
+                                                         .teamName("testTeam")
+                                                         .username("testUser")
+                                                         .views(0)
+                                                         .likes(0)
+                                                         .build();
+
+        when(postService.updatePost(any())).thenReturn(postResponseDTO);
+
+        // When / Then
+        mockMvc.perform(patch("/api/posts/{postId}", postId)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(objectMapper.writeValueAsString(updateRequestDTO)))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.postId").value(postId))
+               .andExpect(jsonPath("$.title").value("Updated Title"))
+               .andExpect(jsonPath("$.content").value("Updated Content"));
+
+        verify(postService, times(1)).updatePost(any());
+    }
+
 }
