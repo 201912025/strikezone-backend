@@ -6,14 +6,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "poll_options")
 public class PollOption {
-
-    @Builder
-    public PollOption(Poll poll, String optionText) {
-        this.poll = poll;
-        this.optionText = optionText;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +22,9 @@ public class PollOption {
     @Column(nullable = false)
     private Integer votesCount = 0;
 
+    @Builder
+    public PollOption(Poll poll, String optionText) {
+        this.poll = poll;
+        this.optionText = optionText;
+    }
 }

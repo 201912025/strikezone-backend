@@ -9,16 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "polls")
 public class Poll extends BaseEntity{
-
-    @Builder
-    public Poll(String title, String description, LocalDateTime startDate, LocalDateTime endDate) {
-        this.title = title;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +18,6 @@ public class Poll extends BaseEntity{
     @Column(nullable = false, length = 50)
     private String title;
 
-    @Lob
     private String description;
 
     @Column(nullable = false)
@@ -36,4 +26,11 @@ public class Poll extends BaseEntity{
     @Column(nullable = false)
     private LocalDateTime endDate;
 
+    @Builder
+    public Poll(String title, String description, LocalDateTime startDate, LocalDateTime endDate) {
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

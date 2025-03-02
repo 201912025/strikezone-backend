@@ -14,15 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "votes")
 public class Vote {
-
-    @Builder
-    public Vote(User user, Poll poll, PollOption option) {
-        this.user = user;
-        this.poll = poll;
-        this.option = option;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,4 +34,10 @@ public class Vote {
 
     private LocalDateTime votedAt = LocalDateTime.now();
 
+    @Builder
+    public Vote(User user, Poll poll, PollOption option) {
+        this.user = user;
+        this.poll = poll;
+        this.option = option;
+    }
 }
