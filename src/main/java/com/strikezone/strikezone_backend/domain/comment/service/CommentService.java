@@ -1,7 +1,7 @@
 package com.strikezone.strikezone_backend.domain.comment.service;
 
-import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentCreateDto;
-import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentUpdateDto;
+import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentCreateServiceDto;
+import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentUpdateServiceDto;
 import com.strikezone.strikezone_backend.domain.comment.dto.response.CommentResponseDto;
 import com.strikezone.strikezone_backend.domain.comment.entity.Comment;
 import com.strikezone.strikezone_backend.domain.comment.exception.CommentExceptionType;
@@ -32,7 +32,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CommentResponseDto createComment(CommentCreateDto dto) {
+    public CommentResponseDto createComment(CommentCreateServiceDto dto) {
         Post post = postRepository.findById(dto.getPostId())
                                   .orElseThrow(() -> new NotFoundException(PostExceptionType.NOT_FOUND_POST));
         User user = userRepository.findById(dto.getUserId())
@@ -55,7 +55,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto updateComment(CommentUpdateDto dto) {
+    public CommentResponseDto updateComment(CommentUpdateServiceDto dto) {
         Comment comment = commentRepository.findById(dto.getCommentId())
                                            .orElseThrow(() -> new NotFoundException(CommentExceptionType.NOT_FOUND_COMMENT));
 

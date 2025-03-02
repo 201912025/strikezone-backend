@@ -1,7 +1,7 @@
 package com.strikezone.strikezone_backend.domain.comment.service;
 
-import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentCreateDto;
-import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentUpdateDto;
+import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentCreateServiceDto;
+import com.strikezone.strikezone_backend.domain.comment.dto.request.service.CommentUpdateServiceDto;
 import com.strikezone.strikezone_backend.domain.comment.dto.response.CommentResponseDto;
 import com.strikezone.strikezone_backend.domain.comment.entity.Comment;
 import com.strikezone.strikezone_backend.domain.comment.exception.CommentExceptionType;
@@ -53,11 +53,11 @@ class CommentServiceTest {
         Long postId = 1L;
         Long userId = 1L;
         String content = "Test comment";
-        CommentCreateDto createDto = CommentCreateDto.builder()
-                                                     .postId(postId)
-                                                     .userId(userId)
-                                                     .content(content)
-                                                     .build();
+        CommentCreateServiceDto createDto = CommentCreateServiceDto.builder()
+                                                                   .postId(postId)
+                                                                   .userId(userId)
+                                                                   .content(content)
+                                                                   .build();
 
         // Post와 User는 기본키가 자동 생성되므로 ReflectionTestUtils로 id 설정
         Post post = Post.builder().build();
@@ -94,11 +94,11 @@ class CommentServiceTest {
         // given
         Long postId = 1L;
         Long userId = 1L;
-        CommentCreateDto createDto = CommentCreateDto.builder()
-                                                     .postId(postId)
-                                                     .userId(userId)
-                                                     .content("Test comment")
-                                                     .build();
+        CommentCreateServiceDto createDto = CommentCreateServiceDto.builder()
+                                                                   .postId(postId)
+                                                                   .userId(userId)
+                                                                   .content("Test comment")
+                                                                   .build();
 
         when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
@@ -115,11 +115,11 @@ class CommentServiceTest {
         // given
         Long postId = 1L;
         Long userId = 1L;
-        CommentCreateDto createDto = CommentCreateDto.builder()
-                                                     .postId(postId)
-                                                     .userId(userId)
-                                                     .content("Test comment")
-                                                     .build();
+        CommentCreateServiceDto createDto = CommentCreateServiceDto.builder()
+                                                                   .postId(postId)
+                                                                   .userId(userId)
+                                                                   .content("Test comment")
+                                                                   .build();
 
         Post post = Post.builder().build();
         ReflectionTestUtils.setField(post, "postId", postId);
@@ -140,11 +140,11 @@ class CommentServiceTest {
         Long commentId = 1L;
         Long userId = 1L;
         String updatedContent = "Updated comment";
-        CommentUpdateDto updateDto = CommentUpdateDto.builder()
-                                                     .commentId(commentId)
-                                                     .userId(userId)
-                                                     .content(updatedContent)
-                                                     .build();
+        CommentUpdateServiceDto updateDto = CommentUpdateServiceDto.builder()
+                                                                   .commentId(commentId)
+                                                                   .userId(userId)
+                                                                   .content(updatedContent)
+                                                                   .build();
 
         Post post = Post.builder().build();
         ReflectionTestUtils.setField(post, "postId", 1L);
@@ -174,11 +174,11 @@ class CommentServiceTest {
         Long commentId = 1L;
         Long writerUserId = 1L;
         Long differentUserId = 2L;
-        CommentUpdateDto updateDto = CommentUpdateDto.builder()
-                                                     .commentId(commentId)
-                                                     .userId(differentUserId)
-                                                     .content("Updated comment")
-                                                     .build();
+        CommentUpdateServiceDto updateDto = CommentUpdateServiceDto.builder()
+                                                                   .commentId(commentId)
+                                                                   .userId(differentUserId)
+                                                                   .content("Updated comment")
+                                                                   .build();
 
         Post post = Post.builder().build();
         ReflectionTestUtils.setField(post, "postId", 1L);

@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class CommentCreateDto {
+public class CommentCreateServiceDto {
     private final Long postId;
     private final Long userId;
     private final String content;
 
     @Builder
-    public CommentCreateDto(Long postId, Long userId, String content) {
+    public CommentCreateServiceDto(Long postId, Long userId, String content) {
         this.postId = postId;
         this.userId = userId;
         this.content = content;
