@@ -1,5 +1,6 @@
-package com.strikezone.strikezone_backend.domain.poll.entity;
+package com.strikezone.strikezone_backend.domain.polloption;
 
+import com.strikezone.strikezone_backend.domain.poll.entity.Poll;
 import jakarta.persistence.*;
 import lombok.*;
 

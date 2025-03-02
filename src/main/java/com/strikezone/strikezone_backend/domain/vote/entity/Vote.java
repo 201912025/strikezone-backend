@@ -1,7 +1,7 @@
 package com.strikezone.strikezone_backend.domain.vote.entity;
 
 import com.strikezone.strikezone_backend.domain.poll.entity.Poll;
-import com.strikezone.strikezone_backend.domain.poll.entity.PollOption;
+import com.strikezone.strikezone_backend.domain.polloption.PollOption;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
