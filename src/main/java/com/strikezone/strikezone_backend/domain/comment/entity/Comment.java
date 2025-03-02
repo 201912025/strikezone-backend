@@ -12,33 +12,26 @@ import lombok.*;
 @Table(name = "comments")
 public class Comment extends BaseEntity{
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long commentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    private String content;
+
     @Builder
     public Comment(Post post, User user, String content) {
         this.post = post;
         this.user = user;
         this.content = content;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentId;
-
-    // 어떤 게시글(Post)에 달린 댓글인지 (다대일)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-
-    // 댓글 작성자 (User) (다대일)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Lob
-    @Column(nullable = false)
-    private String content;
-
-    public void setPost(Post post) {
-        this.post = post;
     }
 
 }
