@@ -1,5 +1,6 @@
 package com.strikezone.strikezone_backend.domain.poll.dto.request.service;
 
+import com.strikezone.strikezone_backend.domain.poll.dto.request.controller.PollCreateControllerRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,5 +19,14 @@ public class PollCreateServiceRequestDto {
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public static PollCreateServiceRequestDto from(PollCreateControllerRequestDto requestDto) {
+        return PollCreateServiceRequestDto.builder()
+                                   .title(requestDto.getTitle())
+                                   .description(requestDto.getDescription())
+                                   .startDate(requestDto.getStartDate())
+                                   .endDate(requestDto.getEndDate())
+                                   .build();
     }
 }
