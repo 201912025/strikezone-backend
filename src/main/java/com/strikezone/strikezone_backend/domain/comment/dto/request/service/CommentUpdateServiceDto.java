@@ -1,5 +1,6 @@
 package com.strikezone.strikezone_backend.domain.comment.dto.request.service;
 
+import com.strikezone.strikezone_backend.domain.comment.dto.request.controller.CommentUpdateRequest;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,5 +15,13 @@ public class CommentUpdateServiceDto {
         this.commentId = commentId;
         this.userId = userId;
         this.content = content;
+    }
+
+    public static CommentUpdateServiceDto from(CommentUpdateRequest commentUpdateRequest, Long commentId) {
+        return CommentUpdateServiceDto.builder()
+                                      .commentId(commentId)
+                                      .userId(commentUpdateRequest.getUserId())
+                                      .content(commentUpdateRequest.getContent())
+                                      .build();
     }
 }

@@ -275,7 +275,7 @@ class CommentServiceTest {
                                   .build();
         ReflectionTestUtils.setField(comment2, "commentId", 2L);
 
-        when(commentRepository.findByPostId(postId)).thenReturn(Arrays.asList(comment1, comment2));
+        when(commentRepository.findCommentsByPostId(postId)).thenReturn(Arrays.asList(comment1, comment2));
 
         // when
         List<CommentResponseDto> commentList = commentService.getCommentsByPost(postId);
