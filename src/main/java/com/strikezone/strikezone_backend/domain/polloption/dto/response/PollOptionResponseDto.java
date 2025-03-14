@@ -1,6 +1,6 @@
 package com.strikezone.strikezone_backend.domain.polloption.dto.response;
 
-import com.strikezone.strikezone_backend.domain.polloption.PollOption;
+import com.strikezone.strikezone_backend.domain.polloption.entity.PollOption;
 import lombok.Builder;
 import lombok.Getter;
 

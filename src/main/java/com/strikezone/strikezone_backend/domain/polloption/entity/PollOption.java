@@ -1,4 +1,4 @@
-package com.strikezone.strikezone_backend.domain.polloption;
+package com.strikezone.strikezone_backend.domain.polloption.entity;
 
 import com.strikezone.strikezone_backend.domain.poll.entity.Poll;
 import jakarta.persistence.*;
@@ -28,4 +28,15 @@ public class PollOption {
         this.poll = poll;
         this.optionText = optionText;
     }
+
+    public void incrementVotesCount() {
+        this.votesCount += 1;
+    }
+
+    public void decrementVotesCount() {
+        if (this.votesCount > 0) {
+            this.votesCount -= 1;
+        }
+    }
+
 }

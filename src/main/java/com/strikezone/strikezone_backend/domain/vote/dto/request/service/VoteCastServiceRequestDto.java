@@ -8,20 +8,20 @@ import lombok.Getter;
 public class VoteCastServiceRequestDto {
     private Long pollId;
     private Long optionId;
-    private Long userId;
+    private String userName;
 
     @Builder
-    public VoteCastServiceRequestDto(Long pollId, Long optionId, Long userId) {
+    public VoteCastServiceRequestDto(Long pollId, Long optionId, String userName) {
         this.pollId = pollId;
         this.optionId = optionId;
-        this.userId = userId;
+        this.userName = userName;
     }
 
-    public static VoteCastServiceRequestDto from(VoteCastControllerRequestDto controllerDto, Long userId) {
+    public static VoteCastServiceRequestDto from(VoteCastControllerRequestDto controllerDto, String userName) {
         return VoteCastServiceRequestDto.builder()
                                         .pollId(controllerDto.getPollId())
                                         .optionId(controllerDto.getOptionId())
-                                        .userId(userId)
+                                        .userName(userName)
                                         .build();
     }
 }

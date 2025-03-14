@@ -1,6 +1,6 @@
 package com.strikezone.strikezone_backend.domain.polloption.repository;
 
-import com.strikezone.strikezone_backend.domain.polloption.PollOption;
+import com.strikezone.strikezone_backend.domain.polloption.entity.PollOption;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

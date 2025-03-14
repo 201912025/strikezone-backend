@@ -1,9 +1,8 @@
 package com.strikezone.strikezone_backend.domain.polloption.service;
 
 import com.strikezone.strikezone_backend.domain.poll.entity.Poll;
-import com.strikezone.strikezone_backend.domain.poll.exception.PollExceptionType;
 import com.strikezone.strikezone_backend.domain.poll.repository.PollRepository;
-import com.strikezone.strikezone_backend.domain.polloption.PollOption;
+import com.strikezone.strikezone_backend.domain.polloption.entity.PollOption;
 import com.strikezone.strikezone_backend.domain.polloption.dto.request.service.PollOptionCreateServiceRequestDto;
 import com.strikezone.strikezone_backend.domain.polloption.dto.response.PollOptionResponseDto;
 import com.strikezone.strikezone_backend.domain.polloption.exception.PollOptionExceptionType;
