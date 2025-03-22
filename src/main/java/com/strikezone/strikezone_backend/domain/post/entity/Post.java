@@ -6,6 +6,7 @@ import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class Post extends BaseEntity {
     private Integer likes = 0;
 
     @OneToMany(mappedBy = "post")
+    @BatchSize(size = 100)
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
