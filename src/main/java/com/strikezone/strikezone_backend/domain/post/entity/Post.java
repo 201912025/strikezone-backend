@@ -41,7 +41,7 @@ public class Post extends BaseEntity {
     private Integer likes = 0;
 
     @OneToMany(mappedBy = "post")
-    @BatchSize(size = 100)
+    @BatchSize(size = 10)
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
