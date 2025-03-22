@@ -16,6 +16,8 @@ import com.strikezone.strikezone_backend.global.exception.type.BadRequestExcepti
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import com.strikezone.strikezone_backend.global.exception.type.UnAuthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,4 +99,16 @@ public class CommentService {
                                                          .build())
                        .collect(Collectors.toList());
     }
+
+    public Page<CommentResponseDto> getCommentsByPostWithPaging(Long postId, Pageable pageable) {
+        Page<Comment> comments = commentRepository.findCommentsByPostIdWithPaging(postId, pageable);
+
+        return comments.map(comment -> CommentResponseDto.builder()
+                                                         .commentId(comment.getCommentId())
+                                                         .postId(comment.getPost().getPostId())
+                                                         .userId(comment.getUser().getUserId())
+                                                         .content(comment.getContent())
+                                                         .build());
+    }
+
 }
