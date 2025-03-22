@@ -137,7 +137,7 @@ public class PostService {
             posts = postRepository.findByUserUsernameContainingIgnoreCase(keyword, pageable);
         } else {
             // 기본: 제목과 내용에서 동시에 검색
-            posts = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, keyword, pageable);
+            posts = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, pageable);
         }
         return posts.map(PostResponseDTO::fromEntity);
     }
