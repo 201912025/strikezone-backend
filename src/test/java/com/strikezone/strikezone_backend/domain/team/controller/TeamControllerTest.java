@@ -87,23 +87,23 @@ class TeamControllerTest {
     @WithMockUser(value = "kim", roles = "USERS")
     void createTeam() throws Exception {
         CreateTeamRequestDTO requestDTO = CreateTeamRequestDTO.builder()
-                .teamName("두산")
-                .build();
+                                                              .teamName("두산")
+                                                              .build();
 
         CreateTeamResponseDTO responseDTO = CreateTeamResponseDTO.builder()
-                .teamId(1L)
-                .teamName("두산")
-                .build();
+                                                                 .teamId(1L)
+                                                                 .teamName("두산")
+                                                                 .build();
 
         when(teamService.createTeam(any(CreateTeamRequestServiceDTO.class))).thenReturn(responseDTO);
 
-        mockMvc.perform(post("/api/teams/{teamId}", 1L)  // URL에서 teamId는 PathVariable로 전달됨
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isCreated()) // 201 Created 상태 코드 확인
-                .andExpect(header().string("Location", "/api/teams/1")) // Location 헤더 확인
-                .andExpect(jsonPath("$.teamId").value(responseDTO.getTeamId())) // 응답 본문에서 teamId 확인
-                .andExpect(jsonPath("$.teamName").value(responseDTO.getTeamName())); // 응답 본문에서 teamName 확인
+        mockMvc.perform(post("/api/teams")  // 수정된 부분: teamId는 경로에 포함되지 않음
+                                            .contentType("application/json")
+                                            .content(objectMapper.writeValueAsString(requestDTO)))
+               .andExpect(status().isCreated()) // 201 Created 상태 코드 확인
+               .andExpect(header().string("Location", "/api/teams/1")) // Location 헤더 확인
+               .andExpect(jsonPath("$.teamId").value(responseDTO.getTeamId())) // 응답 본문에서 teamId 확인
+               .andExpect(jsonPath("$.teamName").value(responseDTO.getTeamName())); // 응답 본문에서 teamName 확인
 
         verify(teamService, times(1)).createTeam(any(CreateTeamRequestServiceDTO.class));
     }
