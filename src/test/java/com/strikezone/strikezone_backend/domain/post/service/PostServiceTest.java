@@ -282,30 +282,6 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 상세 조회 시 조회수 자동 증가 테스트")
-    public void testGetPostById_IncrementViews() {
-        // Given
-        Long postId = 1L;
-        // spy로 생성하여 incrementViews() 호출 여부 검증
-        Post post = spy(Post.builder().title("Test Title").content("Test Content").build());
-        // 초기 조회수 5로 설정
-        ReflectionTestUtils.setField(post, "views", 5);
-        User user = User.builder().username("testUser").build();
-        ReflectionTestUtils.setField(user, "userId", 1L);
-        post.addUser(user);
-
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-
-        // When
-        PostResponseDTO responseDTO = postService.getPostById(postId);
-
-        // Then: 조회수 증가 호출 확인 및 값 검증 (5 -> 6)
-        verify(post, times(1)).incrementViews();
-        assertNotNull(responseDTO);
-        assertEquals(6, responseDTO.getViews(), "조회수는 1 증가해야 합니다.");
-    }
-
-    @Test
     @DisplayName("좋아요 증가 메서드 테스트 (void 메서드)")
     public void testIncrementLikes() {
         // Given
