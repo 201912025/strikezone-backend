@@ -8,11 +8,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PostExceptionType implements ExceptionType {
 
-    NOT_FOUND_POST(4000, "게시글을 찾을 수 없습니다."),
-    UNAUTHORIZED_USER(4010, "작성자가 아니므로 수정할 수 없습니다."),
-    DUPLICATED_TITLE(4020, "중복된 게시글 제목입니다."),
-    INVALID_TITLE(4030, "적절한 게시글 제목이 아닙니다."),
-    INVALID_CONTENT(4040, "적절한 게시글 내용이 아닙니다.");
+    NOT_FOUND_POST(5001, "게시글을 찾을 수 없습니다."),
+    UNAUTHORIZED_USER(5010, "작성자가 아니므로 수정할 수 없습니다."),
+    DUPLICATED_TITLE(5020, "중복된 게시글 제목입니다."),
+    INVALID_TITLE(5030, "적절한 게시글 제목이 아닙니다."),
+    INVALID_CONTENT(5040, "적절한 게시글 내용이 아닙니다.");
 
     private final int statusCode;
     private final String message;
