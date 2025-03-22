@@ -58,7 +58,7 @@ public class PostService {
     }
 
     public PostResponseDTO getPostById(Long postId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByIdWithUserAndTeam(postId)
                                   .orElseThrow(() -> new BadRequestException(PostExceptionType.NOT_FOUND_POST));
         post.incrementViews();
         return PostResponseDTO.fromEntity(post);
@@ -159,5 +159,5 @@ public class PostService {
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(PostResponseDTO::fromEntity);
     }
-    
+
 }
