@@ -40,9 +40,10 @@ public class CommentService {
 
         Comment comment = Comment.builder()
                                  .content(dto.getContent())
-                                 .post(post)
                                  .user(user)
                                  .build();
+
+        comment.addPost(post);
 
         Comment savedComment = commentRepository.save(comment);
 
