@@ -7,11 +7,15 @@ import com.strikezone.strikezone_backend.domain.post.dto.service.PostUpdateReque
 import com.strikezone.strikezone_backend.domain.post.entity.Post;
 import com.strikezone.strikezone_backend.domain.post.exception.PostExceptionType;
 import com.strikezone.strikezone_backend.domain.post.repository.PostRepository;
+import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
+import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.service.UserService;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +54,6 @@ public class PostService {
 
     public List<PostResponseDTO> getPosts() {
         List<Post> posts = postRepository.findAll();
-
         return PostResponseDTO.fromEntities(posts);
     }
 
@@ -123,4 +126,38 @@ public class PostService {
         post.incrementLikes();
     }
 
+    @Transactional(readOnly = true)
+    public Page<PostResponseDTO> searchPosts(String keyword, String searchType, Pageable pageable) {
+        Page<Post> posts;
+        if ("title".equalsIgnoreCase(searchType)) {
+            posts = postRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+        } else if ("content".equalsIgnoreCase(searchType)) {
+            posts = postRepository.findByContentContainingIgnoreCase(keyword, pageable);
+        } else if ("author".equalsIgnoreCase(searchType)) {
+            posts = postRepository.findByUserUsernameContainingIgnoreCase(keyword, pageable);
+        } else {
+            // 기본: 제목과 내용에서 동시에 검색
+            posts = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, keyword, pageable);
+        }
+        return posts.map(PostResponseDTO::fromEntity);
+    }
+
+    public Page<PostResponseDTO> searchPostsByTeam(String teamName, Pageable pageable) {
+        TeamName teamNameEnum;
+        try {
+            teamNameEnum = TeamName.valueOf(teamName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(TeamExceptionType.INVALID_TEAM_NAME);
+        }
+        Page<Post> posts = postRepository.findByTeam_Name(teamNameEnum, pageable);
+        return posts.map(PostResponseDTO::fromEntity);
+
+    }
+
+    // 페이징 및 정렬이 적용된 전체 게시글 조회 (Page 버전)
+    public Page<PostResponseDTO> getPosts(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+        return posts.map(PostResponseDTO::fromEntity);
+    }
+    
 }
