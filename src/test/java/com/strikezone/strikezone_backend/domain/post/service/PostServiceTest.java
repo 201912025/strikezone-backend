@@ -19,6 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -269,16 +273,18 @@ public class PostServiceTest {
         post2.addUser(dummyUser);
 
         List<Post> popularPosts = Arrays.asList(post1, post2);
-        when(postRepository.findTop10ByOrderByViewsDescLikesDesc()).thenReturn(popularPosts);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> popularPostsPage = new PageImpl<>(popularPosts, pageable, popularPosts.size());
+        when(postRepository.findTop10ByOrderByViewsDescLikesDesc(pageable)).thenReturn(popularPostsPage);
 
         // When
-        List<PostResponseDTO> responseList = postService.getPopularPosts();
+        Page<PostResponseDTO> responseList = postService.getPopularPosts();
 
         // Then
         assertNotNull(responseList);
-        assertEquals(2, responseList.size());
-        assertEquals("Title1", responseList.get(0).getTitle());
-        assertEquals("Title2", responseList.get(1).getTitle());
+        assertEquals(2, responseList.getContent().size());
+        assertEquals("Title1", responseList.getContent().get(0).getTitle());
+        assertEquals("Title2", responseList.getContent().get(1).getTitle());
     }
 
     @Test

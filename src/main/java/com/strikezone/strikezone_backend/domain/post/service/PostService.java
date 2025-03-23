@@ -15,6 +15,7 @@ import com.strikezone.strikezone_backend.domain.user.service.UserService;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,9 +115,10 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public List<PostResponseDTO> getPopularPosts() {
-        List<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc();
-        return PostResponseDTO.fromEntities(popularPosts);
+    public Page<PostResponseDTO> getPopularPosts() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc(pageable);
+        return popularPosts.map(PostResponseDTO::fromEntity);
     }
 
     @Transactional
@@ -126,7 +128,6 @@ public class PostService {
         post.incrementLikes();
     }
 
-    @Transactional(readOnly = true)
     public Page<PostResponseDTO> searchPosts(String keyword, String searchType, Pageable pageable) {
         Page<Post> posts;
         if ("title".equalsIgnoreCase(searchType)) {

@@ -7,6 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -124,14 +127,16 @@ public class PostRepositoryTest {
         postRepository.save(post1);
         postRepository.save(post2);
 
+
         // When
-        List<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc(pageable);
 
         // Then
         assertNotNull(popularPosts, "조회 결과는 null이 아니어야 한다");
-        assertTrue(popularPosts.size() >= 2, "최소 2개의 게시글이 조회되어야 한다");
-        assertEquals("Title1", popularPosts.get(0).getTitle());
-        assertEquals("Title2", popularPosts.get(1).getTitle());
+        assertTrue(popularPosts.getContent().size() >= 2, "최소 2개의 게시글이 조회되어야 한다");
+        assertEquals("Title1", popularPosts.getContent().get(0).getTitle());
+        assertEquals("Title2", popularPosts.getContent().get(1).getTitle());
     }
 
 }
