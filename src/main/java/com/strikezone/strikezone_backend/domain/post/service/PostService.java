@@ -58,6 +58,7 @@ public class PostService {
         return PostResponseDTO.fromEntities(posts);
     }
 
+    @Transactional
     public PostResponseDTO getPostById(Long postId) {
         Post post = postRepository.findByIdWithUserAndTeam(postId)
                                   .orElseThrow(() -> new BadRequestException(PostExceptionType.NOT_FOUND_POST));

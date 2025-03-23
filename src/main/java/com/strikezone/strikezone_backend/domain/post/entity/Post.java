@@ -11,9 +11,9 @@ import org.hibernate.annotations.BatchSize;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 public class Post extends BaseEntity {
 
     @Id

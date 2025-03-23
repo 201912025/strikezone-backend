@@ -19,7 +19,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // Top 10 게시글 조회 (정렬만 처리, 연관 엔티티는 엔티티 그래프로 로딩)
     @EntityGraph(attributePaths = {"user", "team"})
-    @Query("select p from Post p order by p.views desc, p.likes desc")
+    @Query("select p from Post p order by p.likes desc, p.views desc")
     Page<Post> findTop10ByOrderByViewsDescLikesDesc(Pageable pageable);
 
     // 제목과 내용을 동시에 검색 (EntityGraph 적용)
