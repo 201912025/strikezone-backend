@@ -34,7 +34,7 @@ public class PostResponseDTO {
                               .postId(post.getPostId())
                               .title(post.getTitle())
                               .content(post.getContent())
-                              .teamName(post.getTeam() != null ? post.getTeam().toString() : null)
+                              .teamName(post.getTeam() != null ? post.getTeam().getName().toString() : null)
                               .username(post.getUser().getUsername())
                               .views(post.getViews())
                               .likes(post.getLikes())
