@@ -14,9 +14,11 @@ import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.service.UserService;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,10 +118,11 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public Page<PostResponseDTO> getPopularPosts() {
+    // @Cacheable(cacheNames = "popularPosts", key = "'popularPosts'", cacheManager = "postCacheManager")
+    public List<PostResponseDTO> getPopularPosts() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc(pageable);
-        return popularPosts.map(PostResponseDTO::fromEntity);
+        return popularPosts.map(PostResponseDTO::fromEntity).getContent();
     }
 
     @Transactional
@@ -157,7 +160,8 @@ public class PostService {
     }
 
     // 페이징 및 정렬이 적용된 전체 게시글 조회 (Page 버전)
-    public Page<PostResponseDTO> getPosts(Pageable pageable) {
+    public Page<PostResponseDTO> getPosts(int page) {
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(PostResponseDTO::fromEntity);
     }

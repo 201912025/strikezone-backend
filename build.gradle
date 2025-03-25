@@ -36,6 +36,8 @@ dependencies {
 
 	implementation 'jakarta.validation:jakarta.validation-api:3.0.0'
 
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	testImplementation 'com.h2database:h2'
 
 	compileOnly 'org.projectlombok:lombok'

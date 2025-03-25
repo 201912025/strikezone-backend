@@ -42,8 +42,8 @@ public class PostController {
     }
 
     @GetMapping("/paged")
-    public ResponseEntity<Page<PostResponseDTO>> getPostsPaged(Pageable pageable) {
-        Page<PostResponseDTO> postsPage = postService.getPosts(pageable);
+    public ResponseEntity<Page<PostResponseDTO>> getPostsPaged(@RequestParam(defaultValue = "0") int page) {
+        Page<PostResponseDTO> postsPage = postService.getPosts(page);
         return ResponseEntity.ok(postsPage);
     }
 
@@ -91,8 +91,8 @@ public class PostController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<Page<PostResponseDTO>> getPopularPosts() {
-        Page<PostResponseDTO> popularPosts = postService.getPopularPosts();
+    public ResponseEntity<List<PostResponseDTO>> getPopularPosts() {
+        List<PostResponseDTO> popularPosts = postService.getPopularPosts();
         return ResponseEntity.ok(popularPosts);
     }
 

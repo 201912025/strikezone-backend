@@ -278,13 +278,13 @@ public class PostServiceTest {
         when(postRepository.findTop10ByOrderByViewsDescLikesDesc(pageable)).thenReturn(popularPostsPage);
 
         // When
-        Page<PostResponseDTO> responseList = postService.getPopularPosts();
+        List<PostResponseDTO> responseList = postService.getPopularPosts();
 
         // Then
         assertNotNull(responseList);
-        assertEquals(2, responseList.getContent().size());
-        assertEquals("Title1", responseList.getContent().get(0).getTitle());
-        assertEquals("Title2", responseList.getContent().get(1).getTitle());
+        assertEquals(2, responseList.size());
+        assertEquals("Title1", responseList.get(0).getTitle());
+        assertEquals("Title2", responseList.get(1).getTitle());
     }
 
     @Test
