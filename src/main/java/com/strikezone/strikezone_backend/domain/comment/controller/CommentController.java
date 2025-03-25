@@ -7,6 +7,7 @@ import com.strikezone.strikezone_backend.domain.comment.dto.request.service.Comm
 import com.strikezone.strikezone_backend.domain.comment.dto.response.CommentResponseDto;
 import com.strikezone.strikezone_backend.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,9 +48,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentResponseDto>> getCommentsByPost(@RequestParam Long postId) {
-        List<CommentResponseDto> responses = commentService.getCommentsByPost(postId);
-
+    public ResponseEntity<Page<CommentResponseDto>> getCommentsByPost(@RequestParam Long postId, @RequestParam int page) {
+        Page<CommentResponseDto> responses = commentService.getCommentsByPostWithPaging(postId, page);
         return ResponseEntity.ok(responses);
     }
 }

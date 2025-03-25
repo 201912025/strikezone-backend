@@ -13,10 +13,10 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("select c from Comment c where c.post.postId = :postId")
+    @Query("select c from Comment c join fetch c.user where c.post.postId = :postId")
     List<Comment> findCommentsByPostId(@Param("postId") Long postId);
 
-    @Query("select c from Comment c where c.post.postId = :postId")
+    @Query("select c from Comment c join fetch c.user where c.post.postId = :postId")
     Page<Comment> findCommentsByPostIdWithPaging(@Param("postId") Long postId, Pageable pageable);
 
 }

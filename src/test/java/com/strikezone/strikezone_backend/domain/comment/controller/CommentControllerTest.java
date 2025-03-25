@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -123,20 +126,25 @@ class CommentControllerTest {
     void getCommentsByPost_success() throws Exception {
         // given
         Long postId = 1L;
+        int page = 0;
         List<CommentResponseDto> serviceResponses = Arrays.asList(
                 CommentResponseDto.builder().commentId(1L).postId(postId).userId(1L).content("Comment 1").build(),
                 CommentResponseDto.builder().commentId(2L).postId(postId).userId(2L).content("Comment 2").build()
         );
+        Page<CommentResponseDto> commentPage = new PageImpl<>(serviceResponses, PageRequest.of(page, 20), serviceResponses.size());
 
-        when(commentService.getCommentsByPost(postId)).thenReturn(serviceResponses);
+        when(commentService.getCommentsByPostWithPaging(postId, page)).thenReturn(commentPage);
 
         // when & then
-        mockMvc.perform(get("/api/comments").param("postId", String.valueOf(postId)))
+        mockMvc.perform(get("/api/comments")
+                       .param("postId", String.valueOf(postId))
+                       .param("page", String.valueOf(page)))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$", hasSize(2)))
-               .andExpect(jsonPath("$[0].commentId", is(1)))
-               .andExpect(jsonPath("$[0].content", is("Comment 1")))
-               .andExpect(jsonPath("$[1].commentId", is(2)))
-               .andExpect(jsonPath("$[1].content", is("Comment 2")));
+               .andExpect(jsonPath("$.content", hasSize(2)))
+               .andExpect(jsonPath("$.content[0].commentId", is(1)))
+               .andExpect(jsonPath("$.content[0].content", is("Comment 1")))
+               .andExpect(jsonPath("$.content[1].commentId", is(2)))
+               .andExpect(jsonPath("$.content[1].content", is("Comment 2")));
     }
+
 }
