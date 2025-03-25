@@ -14,6 +14,9 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_post_created_at", columnList = "created_at")
+})
 public class Post extends BaseEntity {
 
     @Id
@@ -72,5 +75,4 @@ public class Post extends BaseEntity {
     public void incrementLikes() {
         this.likes += 1;
     }
-
 }

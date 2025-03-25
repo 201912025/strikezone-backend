@@ -118,7 +118,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // @Cacheable(cacheNames = "popularPosts", key = "'popularPosts'", cacheManager = "postCacheManager")
+    @Cacheable(cacheNames = "popularPosts", key = "'popularPosts'", cacheManager = "postCacheManager")
     public List<PostResponseDTO> getPopularPosts() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc(pageable);

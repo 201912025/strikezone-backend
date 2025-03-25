@@ -9,7 +9,6 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "comments")
 public class Comment extends BaseEntity{
 
     @Id
