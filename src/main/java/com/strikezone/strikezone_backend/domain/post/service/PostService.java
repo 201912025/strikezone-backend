@@ -133,17 +133,7 @@ public class PostService {
     }
 
     public Page<PostResponseDTO> searchPosts(String keyword, String searchType, Pageable pageable) {
-        Page<Post> posts;
-        if ("title".equalsIgnoreCase(searchType)) {
-            posts = postRepository.findByTitleContainingIgnoreCase(keyword, pageable);
-        } else if ("content".equalsIgnoreCase(searchType)) {
-            posts = postRepository.findByContentContainingIgnoreCase(keyword, pageable);
-        } else if ("author".equalsIgnoreCase(searchType)) {
-            posts = postRepository.findByUserUsernameContainingIgnoreCase(keyword, pageable);
-        } else {
-            // 기본: 제목과 내용에서 동시에 검색
-            posts = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(keyword, pageable);
-        }
+        Page<Post> posts = postRepository.searchPosts(keyword, searchType, pageable);
         return posts.map(PostResponseDTO::fromEntity);
     }
 

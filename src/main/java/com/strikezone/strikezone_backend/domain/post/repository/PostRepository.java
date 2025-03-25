@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
     Boolean existsByTitle(String title);
 
@@ -21,22 +21,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @EntityGraph(attributePaths = {"user", "team"})
     @Query("select p from Post p order by p.likes desc, p.views desc")
     Page<Post> findTop10ByOrderByViewsDescLikesDesc(Pageable pageable);
-
-    // 제목과 내용을 동시에 검색 (EntityGraph 적용)
-    @EntityGraph(attributePaths = {"user", "team"})
-    @Query("select p from Post p where lower(p.title) like lower(concat('%', :keyword, '%')) " +
-            "or lower(p.content) like lower(concat('%', :keyword, '%'))")
-    Page<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(@Param("keyword") String keyword, Pageable pageable);
-
-    // 제목만 검색 (EntityGraph 적용)
-    @EntityGraph(attributePaths = {"user", "team"})
-    @Query("select p from Post p where lower(p.title) like lower(concat('%', :title, '%'))")
-    Page<Post> findByTitleContainingIgnoreCase(@Param("title") String title, Pageable pageable);
-
-    // 내용만 검색 (EntityGraph 적용)
-    @EntityGraph(attributePaths = {"user", "team"})
-    @Query("select p from Post p where lower(p.content) like lower(concat('%', :content, '%'))")
-    Page<Post> findByContentContainingIgnoreCase(@Param("content") String content, Pageable pageable);
 
     // 작성자(유저 이름)로 검색 (EntityGraph 적용)
     @EntityGraph(attributePaths = {"user", "team"})
