@@ -13,6 +13,7 @@ import com.strikezone.strikezone_backend.domain.vote.dto.response.VoteResponseDt
 import com.strikezone.strikezone_backend.domain.vote.entity.Vote;
 import com.strikezone.strikezone_backend.domain.vote.exception.VoteExceptionType;
 import com.strikezone.strikezone_backend.domain.vote.repository.VoteRepository;
+import com.strikezone.strikezone_backend.global.config.replica.ReadOnlyConnection;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +63,7 @@ public class VoteService {
         return VoteResponseDto.from(savedVote);
     }
 
+    @ReadOnlyConnection
     public List<VoteResponseDto> getVotesByPoll(Long pollId) {
         List<Vote> votes = voteRepository.findByPoll_PollId(pollId);
         return VoteResponseDto.fromEntities(votes);
@@ -89,6 +91,7 @@ public class VoteService {
         pollOptionRepository.save(option);
     }
 
+    @ReadOnlyConnection
     public VoteFinalResultResponseDto getFinalVoteResults(Long pollId) {
         List<Vote> votes = voteRepository.findByPoll_PollId(pollId);
         Map<Long, List<Vote>> votesByOption = votes.stream()

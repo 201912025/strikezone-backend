@@ -7,6 +7,7 @@ import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
 import com.strikezone.strikezone_backend.domain.team.repository.TeamRepository;
+import com.strikezone.strikezone_backend.global.config.replica.ReadOnlyConnection;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,12 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
 
+    @ReadOnlyConnection
     public List<Team> findAllTeams() {
         return teamRepository.findAll();
     }
 
+    @ReadOnlyConnection
     public Team findTeamById(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
@@ -34,6 +37,7 @@ public class TeamService {
         return team;
     }
 
+    @ReadOnlyConnection
     public Team findByTeamName(String teamName) {
         TeamName teamNameEnum;
         try {
@@ -46,6 +50,7 @@ public class TeamService {
                 .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
     }
 
+    @ReadOnlyConnection
     public List<TeamWithPlayerNamesResponseDTO> findAllTeamsAsDTO() {
         List<Team> teams = teamRepository.findAllTeamsWithPlayers();
 
@@ -54,6 +59,7 @@ public class TeamService {
                 .collect(Collectors.toList());
     }
 
+    @ReadOnlyConnection
     public TeamWithPlayerNamesResponseDTO findTeamByIdAsDTO(Long teamId) {
         Team team = teamRepository.findByIdWithPlayers(teamId)
                 .orElseThrow(() -> new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));

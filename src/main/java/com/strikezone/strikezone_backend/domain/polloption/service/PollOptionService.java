@@ -7,6 +7,7 @@ import com.strikezone.strikezone_backend.domain.polloption.dto.request.service.P
 import com.strikezone.strikezone_backend.domain.polloption.dto.response.PollOptionResponseDto;
 import com.strikezone.strikezone_backend.domain.polloption.exception.PollOptionExceptionType;
 import com.strikezone.strikezone_backend.domain.polloption.repository.PollOptionRepository;
+import com.strikezone.strikezone_backend.global.config.replica.ReadOnlyConnection;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ public class PollOptionService {
         pollOptionRepository.delete(pollOption);
     }
 
+    @ReadOnlyConnection
     public List<PollOptionResponseDto> getPollOptions(Long pollId) {
         List<PollOption> options = pollOptionRepository.findByPoll_PollId(pollId);
         return PollOptionResponseDto.fromEntities(options);

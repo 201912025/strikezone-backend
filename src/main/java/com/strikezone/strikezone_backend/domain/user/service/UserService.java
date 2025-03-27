@@ -8,6 +8,7 @@ import com.strikezone.strikezone_backend.domain.user.dto.service.UpdateUserServi
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.exception.UserExceptionType;
 import com.strikezone.strikezone_backend.domain.user.repository.UserRepository;
+import com.strikezone.strikezone_backend.global.config.replica.ReadOnlyConnection;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,7 @@ public class UserService {
         }
     }
 
+    @ReadOnlyConnection
     public UserResponseDTO getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserExceptionType.NOT_FOUND_USER));
@@ -93,6 +95,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @ReadOnlyConnection
     public User getUserBySecurityUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(UserExceptionType.NOT_FOUND_USER));

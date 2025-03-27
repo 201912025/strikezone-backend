@@ -10,6 +10,7 @@ import com.strikezone.strikezone_backend.domain.player.exception.PlayerException
 import com.strikezone.strikezone_backend.domain.player.repository.PlayerRepository;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
+import com.strikezone.strikezone_backend.global.config.replica.ReadOnlyConnection;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,7 @@ public class PlayerService {
                                       .build();
     }
 
+    @ReadOnlyConnection
     public PlayerResponseDTO getPlayer(Long playerId) {
         Player player = playerRepository.findByIdWithTeam(playerId)
                                         .orElseThrow(() -> new NotFoundException(PlayerExceptionType.NOT_FOUND_PLAYER));
@@ -84,7 +86,7 @@ public class PlayerService {
 
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyConnection
     public List<PlayerResponseDTO> getAllPlayersWithTeam() {
         List<Player> players = playerRepository.findAllWithTeam();
         return players.stream()
