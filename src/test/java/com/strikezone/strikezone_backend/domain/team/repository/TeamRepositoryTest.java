@@ -1,5 +1,7 @@
 package com.strikezone.strikezone_backend.domain.team.repository;
 
+import com.strikezone.strikezone_backend.domain.config.QuerydslTestConfig;
+import com.strikezone.strikezone_backend.domain.config.TestRedisCacheConfig;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
 import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
 
@@ -15,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
+@Import({QuerydslTestConfig.class, TestRedisCacheConfig.class}) // 필요한 테스트 전용 설정들을 Import
 class TeamRepositoryTest {
 
     @Autowired

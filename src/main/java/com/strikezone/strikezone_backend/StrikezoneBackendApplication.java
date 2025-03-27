@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })@EnableJpaAuditing
-@EnableCaching
 public class StrikezoneBackendApplication {
 
 	public static void main(String[] args) {

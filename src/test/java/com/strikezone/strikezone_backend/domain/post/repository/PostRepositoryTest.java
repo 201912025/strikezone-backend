@@ -1,5 +1,7 @@
 package com.strikezone.strikezone_backend.domain.post.repository;
 
+import com.strikezone.strikezone_backend.domain.config.QuerydslTestConfig;
+import com.strikezone.strikezone_backend.domain.config.TestRedisCacheConfig;
 import com.strikezone.strikezone_backend.domain.post.entity.Post;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.repository.UserRepository;
@@ -7,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@Import({QuerydslTestConfig.class, TestRedisCacheConfig.class}) // 필요한 테스트 전용 설정들을 Import
 public class PostRepositoryTest {
 
     @Autowired
