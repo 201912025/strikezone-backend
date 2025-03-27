@@ -12,6 +12,7 @@ import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.service.UserService;
+import com.strikezone.strikezone_backend.global.config.replica.ReadOnlyConnection;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -55,6 +56,7 @@ public class PostService {
         return PostResponseDTO.fromEntity(savedPost);
     }
 
+    @ReadOnlyConnection
     public List<PostResponseDTO> getPosts() {
         List<Post> posts = postRepository.findAll();
         return PostResponseDTO.fromEntities(posts);
@@ -119,6 +121,7 @@ public class PostService {
     }
 
     @Cacheable(cacheNames = "popularPosts", key = "'popularPosts'", cacheManager = "postCacheManager")
+    @ReadOnlyConnection
     public List<PostResponseDTO> getPopularPosts() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> popularPosts = postRepository.findTop10ByOrderByViewsDescLikesDesc(pageable);
@@ -132,11 +135,13 @@ public class PostService {
         post.incrementLikes();
     }
 
+    @ReadOnlyConnection
     public Page<PostResponseDTO> searchPosts(String keyword, String searchType, Pageable pageable) {
         Page<Post> posts = postRepository.searchPosts(keyword, searchType, pageable);
         return posts.map(PostResponseDTO::fromEntity);
     }
 
+    @ReadOnlyConnection
     public Page<PostResponseDTO> searchPostsByTeam(String teamName, Pageable pageable) {
         TeamName teamNameEnum;
         try {
@@ -149,6 +154,7 @@ public class PostService {
 
     }
 
+    @ReadOnlyConnection
     // 페이징 및 정렬이 적용된 전체 게시글 조회 (Page 버전)
     public Page<PostResponseDTO> getPosts(int page) {
         Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));

@@ -12,6 +12,7 @@ import com.strikezone.strikezone_backend.domain.post.repository.PostRepository;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.exception.UserExceptionType;
 import com.strikezone.strikezone_backend.domain.user.repository.UserRepository;
+import com.strikezone.strikezone_backend.global.config.replica.ReadOnlyConnection;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import com.strikezone.strikezone_backend.global.exception.type.UnAuthorizedException;
@@ -90,6 +91,7 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+    @ReadOnlyConnection
     public List<CommentResponseDto> getCommentsByPost(Long postId) {
         List<Comment> comments = commentRepository.findCommentsByPostId(postId);
         return comments.stream()
@@ -102,6 +104,7 @@ public class CommentService {
                        .collect(Collectors.toList());
     }
 
+    @ReadOnlyConnection
     public Page<CommentResponseDto> getCommentsByPostWithPaging(Long postId, int page) {
         Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Comment> comments = commentRepository.findCommentsByPostIdWithPaging(postId, pageable);

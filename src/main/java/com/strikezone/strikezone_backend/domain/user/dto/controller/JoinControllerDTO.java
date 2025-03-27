@@ -1,6 +1,5 @@
 package com.strikezone.strikezone_backend.domain.user.dto.controller;
 
-import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.user.dto.service.JoinServiceDTO;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
