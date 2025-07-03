@@ -5,13 +5,17 @@ import com.strikezone.strikezone_backend.domain.team.dto.controller.request.Crea
 import com.strikezone.strikezone_backend.domain.team.dto.response.CreateTeamResponseDTO;
 import com.strikezone.strikezone_backend.domain.team.dto.response.TeamWithPlayerNamesResponseDTO;
 import com.strikezone.strikezone_backend.domain.team.dto.service.CreateTeamRequestServiceDTO;
+import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
+import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
+import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -97,13 +101,13 @@ class TeamControllerTest {
 
         when(teamService.createTeam(any(CreateTeamRequestServiceDTO.class))).thenReturn(responseDTO);
 
-        mockMvc.perform(post("/api/teams")  // 수정된 부분: teamId는 경로에 포함되지 않음
+        mockMvc.perform(post("/api/teams")
                                             .contentType("application/json")
                                             .content(objectMapper.writeValueAsString(requestDTO)))
                .andExpect(status().isCreated()) // 201 Created 상태 코드 확인
-               .andExpect(header().string("Location", "/api/teams/1")) // Location 헤더 확인
-               .andExpect(jsonPath("$.teamId").value(responseDTO.getTeamId())) // 응답 본문에서 teamId 확인
-               .andExpect(jsonPath("$.teamName").value(responseDTO.getTeamName())); // 응답 본문에서 teamName 확인
+               .andExpect(header().string("Location", "/api/teams/1"))
+               .andExpect(jsonPath("$.teamId").value(responseDTO.getTeamId()))
+               .andExpect(jsonPath("$.teamName").value(responseDTO.getTeamName()));
 
         verify(teamService, times(1)).createTeam(any(CreateTeamRequestServiceDTO.class));
     }
@@ -120,6 +124,52 @@ class TeamControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(teamService, times(1)).deleteTeamById(teamId);
+    }
+
+    @Test
+    @DisplayName("getTeamById: 없는 팀 조회 시 404 Not Found")
+    @WithMockUser(value = "kim", roles = "USERS")
+    void getTeamById_NotFound() throws Exception {
+        when(teamService.findTeamByIdAsDTO(99L))
+                .thenThrow(new NotFoundException(TeamExceptionType.NOT_FOUND_TEAM));
+
+        mockMvc.perform(get("/api/teams/99"))
+               .andExpect(status().isNotFound());
+
+        verify(teamService).findTeamByIdAsDTO(99L);
+    }
+
+    @Test
+    @DisplayName("getAllTeams: 팀이 하나도 없으면 빈 배열 반환")
+    @WithMockUser(value = "kim", roles = "USERS")
+    void getAllTeams_Empty() throws Exception {
+        when(teamService.findAllTeamsAsDTO()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/teams"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$").isArray())
+               .andExpect(jsonPath("$.length()").value(0));
+
+        verify(teamService).findAllTeamsAsDTO();
+    }
+
+    @Test
+    @DisplayName("createTeam: 잘못된 이름으로 요청 시 400 Bad Request")
+    @WithMockUser(value = "kim", roles = "USERS")
+    void createTeam_InvalidName() throws Exception {
+        CreateTeamRequestDTO badDto = CreateTeamRequestDTO.builder()
+                                                          .teamName("UNKNOWN")
+                                                          .build();
+
+        when(teamService.createTeam(any(CreateTeamRequestServiceDTO.class)))
+                .thenThrow(new BadRequestException(TeamExceptionType.INVALID_TEAM_NAME));
+
+        mockMvc.perform(post("/api/teams")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(objectMapper.writeValueAsString(badDto)))
+               .andExpect(status().isBadRequest());
+
+        verify(teamService).createTeam(any());
     }
 
 }

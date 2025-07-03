@@ -184,4 +184,52 @@ class UserServiceTest {
 
         assertEquals(UserExceptionType.NOT_FOUND_USER, exception.getExceptionType());
     }
+
+    @Test
+    @DisplayName("joinUser: 닉네임이 null 이면 INVALID_NICKNAME 예외")
+    void joinUser_InvalidUsernameNull() {
+        JoinServiceDTO badDto = JoinServiceDTO.builder()
+                                              .username(null)
+                                              .password("pw")
+                                              .email("e@e.com")
+                                              .teamName("KIA")
+                                              .build();
+
+        assertThrows(BadRequestException.class, () -> userService.joinUser(badDto));
+        verify(userRepository, never()).save(any());    // 저장 시도 없음
+    }
+
+    @Test
+    @DisplayName("joinUser: 닉네임이 빈 문자열이면 INVALID_NICKNAME 예외")
+    void joinUser_InvalidUsernameEmpty() {
+        JoinServiceDTO badDto = JoinServiceDTO.builder()
+                                              .username("")
+                                              .password("pw")
+                                              .email("e@e.com")
+                                              .teamName("KIA")
+                                              .build();
+
+        assertThrows(BadRequestException.class, () -> userService.joinUser(badDto));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("getUserBySecurityUsername: 존재 사용자 성공 조회")
+    void getUserBySecurityUsernameSuccess() {
+        when(userRepository.findByUsername("johndoe")).thenReturn(java.util.Optional.of(user));
+
+        User found = userService.getUserBySecurityUsername("johndoe");
+
+        assertNotNull(found);
+        assertEquals("johndoe", found.getUsername());
+    }
+
+    @Test
+    @DisplayName("getUserBySecurityUsername: 없는 사용자 예외")
+    void getUserBySecurityUsernameNotFound() {
+        when(userRepository.findByUsername("nouser")).thenReturn(java.util.Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> userService.getUserBySecurityUsername("nouser"));
+    }
 }

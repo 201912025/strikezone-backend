@@ -1,5 +1,6 @@
 package com.strikezone.strikezone_backend.domain.team.service;
 
+import com.strikezone.strikezone_backend.domain.team.dto.response.TeamWithPlayerNamesResponseDTO;
 import com.strikezone.strikezone_backend.domain.team.dto.service.CreateTeamRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -132,5 +134,71 @@ class TeamServiceTest {
         assertThatThrownBy(() -> teamService.deleteTeamById(1L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("팀을 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("findByTeamName: 정상 이름으로 조회 성공")
+    void findByTeamNameSuccess() {
+        Team team = Team.builder().name(TeamName.KIA).build();
+        when(teamRepository.findByName(TeamName.KIA)).thenReturn(Optional.of(team));
+
+        Team result = teamService.findByTeamName("kia");
+        assertThat(result).isSameAs(team);
+
+        verify(teamRepository).findByName(TeamName.KIA);
+    }
+
+    @Test
+    @DisplayName("findByTeamName: 잘못된 이름으로 조회 시 BadRequestException")
+    void findByTeamNameInvalid() {
+        assertThatThrownBy(() -> teamService.findByTeamName("UNKNOWN"))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("유효하지 않은 팀 이름 형식입니다.");
+    }
+
+    @Test
+    @DisplayName("findByTeamName: 존재하지 않는 팀이면 NotFoundException")
+    void findByTeamNameNotFound() {
+        when(teamRepository.findByName(TeamName.LG)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> teamService.findByTeamName("LG"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("팀을 찾을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("findAllTeamsAsDTO: 엔티티 리스트 → DTO 리스트 매핑")
+    void findAllTeamsAsDTOSuccess() {
+        Team team1 = Team.builder().name(TeamName.두산).build();
+        Team team2 = Team.builder().name(TeamName.LG).build();
+
+        when(teamRepository.findAllTeamsWithPlayers()).thenReturn(List.of(team1, team2));
+
+        List<TeamWithPlayerNamesResponseDTO> dtos = teamService.findAllTeamsAsDTO();
+        assertThat(dtos).hasSize(2)
+                        .extracting(TeamWithPlayerNamesResponseDTO::getTeamName)
+                        .containsExactlyInAnyOrder("두산", "LG");
+
+        verify(teamRepository).findAllTeamsWithPlayers();
+    }
+
+    @Test
+    @DisplayName("findTeamByIdAsDTO: 정상 조회 후 DTO 반환")
+    void findTeamByIdAsDTOSuccess() {
+        Team team = Team.builder().name(TeamName.KIA).build();
+        when(teamRepository.findByIdWithPlayers(10L)).thenReturn(Optional.of(team));
+
+        TeamWithPlayerNamesResponseDTO dto = teamService.findTeamByIdAsDTO(10L);
+        assertThat(dto.getTeamName()).isEqualTo("KIA");
+
+        verify(teamRepository).findByIdWithPlayers(10L);
+    }
+
+    @Test
+    @DisplayName("findTeamByIdAsDTO: 없는 ID 조회 시 NotFoundException")
+    void findTeamByIdAsDTONotFound() {
+        when(teamRepository.findByIdWithPlayers(99L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> teamService.findTeamByIdAsDTO(99L))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("팀을 찾을 수 없습니다");
     }
 }

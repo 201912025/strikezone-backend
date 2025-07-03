@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -285,5 +286,56 @@ class CommentServiceTest {
         assertEquals(2, commentList.size());
         assertEquals("Comment 1", commentList.get(0).getContent());
         assertEquals("Comment 2", commentList.get(1).getContent());
+    }
+
+    @Test
+    @DisplayName("updateComment: 존재하지 않는 댓글 → NOT_FOUND_COMMENT")
+    void updateComment_commentNotFound() {
+        when(commentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        CommentUpdateServiceDto dto = CommentUpdateServiceDto.builder()
+                                                             .commentId(99L)
+                                                             .userId(1L)
+                                                             .content("x")
+                                                             .build();
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> commentService.updateComment(dto));
+        assertEquals(CommentExceptionType.NOT_FOUND_COMMENT.getMessage(), ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("deleteComment: 존재하지 않는 댓글 → NOT_FOUND_COMMENT")
+    void deleteComment_commentNotFound() {
+        when(commentRepository.findById(77L)).thenReturn(Optional.empty());
+        NotFoundException ex = assertThrows(NotFoundException.class,
+                () -> commentService.deleteComment(77L, 1L));
+        assertEquals(CommentExceptionType.NOT_FOUND_COMMENT.getMessage(), ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("getCommentsByPostWithPaging: 페이징 조회 후 DTO 매핑")
+    void getCommentsByPostWithPaging_success() {
+        Long postId = 1L;
+        Pageable pg = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Post post = Post.builder().build();
+        ReflectionTestUtils.setField(post, "postId", postId);
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "userId", 1L);
+
+        Comment c1 = Comment.builder().content("C1").post(post).user(user).build();
+        ReflectionTestUtils.setField(c1, "commentId", 1L);
+        Comment c2 = Comment.builder().content("C2").post(post).user(user).build();
+        ReflectionTestUtils.setField(c2, "commentId", 2L);
+
+        Page<Comment> page = new PageImpl<>(List.of(c1, c2), pg, 2);
+        when(commentRepository.findCommentsByPostIdWithPaging(eq(postId), any(Pageable.class)))
+                .thenReturn(page);
+
+        Page<CommentResponseDto> dtoPage = commentService.getCommentsByPostWithPaging(postId, 0);
+
+        assertEquals(2, dtoPage.getTotalElements());
+        assertEquals("C1", dtoPage.getContent().get(0).getContent());
+        assertEquals("C2", dtoPage.getContent().get(1).getContent());
     }
 }

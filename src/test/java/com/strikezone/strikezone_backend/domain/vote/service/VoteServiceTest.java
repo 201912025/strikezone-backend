@@ -7,16 +7,19 @@ import com.strikezone.strikezone_backend.domain.polloption.repository.PollOption
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.user.repository.UserRepository;
 import com.strikezone.strikezone_backend.domain.vote.dto.request.service.VoteCastServiceRequestDto;
+import com.strikezone.strikezone_backend.domain.vote.dto.response.VoteFinalResultResponseDto;
 import com.strikezone.strikezone_backend.domain.vote.dto.response.VoteResponseDto;
 import com.strikezone.strikezone_backend.domain.vote.entity.Vote;
 import com.strikezone.strikezone_backend.domain.vote.repository.VoteRepository;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
+import com.strikezone.strikezone_backend.global.exception.type.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -180,5 +183,120 @@ class VoteServiceTest {
 
         assertNotNull(response);
         assertEquals(1, response.size());
+    }
+
+    @Test
+    @DisplayName("castVote: 정상 투표 시 DTO 반환 및 카운트 +1")
+    void castVoteSuccess() {
+        Long pollId = 1L;
+        Long optId  = 10L;
+        String userName = "user1";
+
+        Poll poll = Poll.builder()
+                        .title("T").description("D")
+                        .startDate(LocalDateTime.now())
+                        .endDate(LocalDateTime.now().plusDays(1))
+                        .build();
+
+        PollOption option = PollOption.builder()
+                                      .poll(poll)
+                                      .optionText("A")
+                                      .build();
+        ReflectionTestUtils.setField(option, "optionId", optId);
+
+        User user = User.builder().username(userName).build();
+
+        Vote saved = Vote.builder()
+                         .user(user)
+                         .poll(poll)
+                         .option(option)
+                         .build();
+
+        when(pollRepository.findById(pollId)).thenReturn(Optional.of(poll));
+        when(pollOptionRepository.findById(optId)).thenReturn(Optional.of(option));
+        when(userRepository.findByUsername(userName)).thenReturn(Optional.of(user));
+        when(voteRepository.findByPollAndUser(poll, user)).thenReturn(null);
+        when(voteRepository.save(any(Vote.class))).thenReturn(saved);
+
+        VoteResponseDto dto = voteService.castVote(
+                new VoteCastServiceRequestDto(pollId, optId, userName));
+
+        assertNotNull(dto);
+        assertEquals(optId, dto.getOptionId());
+        verify(pollOptionRepository, never()).save(option);
+        verify(voteRepository).save(any(Vote.class));
+        // incrementVotesCount() 호출 여부
+        assertEquals(1, option.getVotesCount());
+    }
+
+    @Test
+    @DisplayName("castVote: Poll ID가 존재하지 않으면 NotFoundException")
+    void castVotePollNotFound() {
+        when(pollRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> voteService.castVote(new VoteCastServiceRequestDto(1L, 2L, "u")));
+    }
+
+    @Test
+    @DisplayName("castVote: Option ID가 존재하지 않으면 NotFoundException")
+    void castVoteOptionNotFound() {
+        Poll poll = Poll.builder().title("T").description("D")
+                        .startDate(LocalDateTime.now())
+                        .endDate(LocalDateTime.now().plusDays(1)).build();
+        when(pollRepository.findById(1L)).thenReturn(Optional.of(poll));
+        when(pollOptionRepository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> voteService.castVote(new VoteCastServiceRequestDto(1L, 2L, "u")));
+    }
+
+    @Test
+    @DisplayName("castVote: User가 존재하지 않으면 NotFoundException")
+    void castVoteUserNotFound() {
+        Poll poll   = Poll.builder().title("T").description("D")
+                          .startDate(LocalDateTime.now())
+                          .endDate(LocalDateTime.now().plusDays(1)).build();
+        PollOption opt = PollOption.builder().poll(poll).optionText("A").build();
+
+        when(pollRepository.findById(1L)).thenReturn(Optional.of(poll));
+        when(pollOptionRepository.findById(2L)).thenReturn(Optional.of(opt));
+        when(userRepository.findByUsername("nouser")).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> voteService.castVote(new VoteCastServiceRequestDto(1L, 2L, "nouser")));
+    }
+
+    @Test
+    @DisplayName("getFinalVoteResults: 투표 결과 집계 및 순위 부여")
+    void getFinalVoteResultsSuccess() {
+        Poll poll = Poll.builder()
+                        .title("T").description("D")
+                        .startDate(LocalDateTime.now())
+                        .endDate(LocalDateTime.now().plusDays(1))
+                        .build();
+
+        PollOption optA = PollOption.builder().poll(poll).optionText("A").build();
+        PollOption optB = PollOption.builder().poll(poll).optionText("B").build();
+
+        ReflectionTestUtils.setField(optA, "optionId", 1L);
+        ReflectionTestUtils.setField(optB, "optionId", 2L);
+        User user1 = User.builder().username("u1").build();
+        User user2 = User.builder().username("u2").build();
+
+        Vote v1 = Vote.builder().poll(poll).option(optA).user(user1).build();
+        Vote v2 = Vote.builder().poll(poll).option(optA).user(user2).build();
+        Vote v3 = Vote.builder().poll(poll).option(optB).user(user1).build();
+
+        when(voteRepository.findByPoll_PollId(1L)).thenReturn(List.of(v1, v2, v3));
+
+        VoteFinalResultResponseDto dto = voteService.getFinalVoteResults(1L);
+
+        assertEquals(1L, dto.getPollId());
+        assertEquals(2, dto.getFinalResults().size());
+        assertEquals("A", dto.getFinalResults().get(0).getOptionText());
+        assertEquals(1,  dto.getFinalResults().get(0).getRank());
+        assertEquals("B", dto.getFinalResults().get(1).getOptionText());
+        assertEquals(2,  dto.getFinalResults().get(1).getRank());
     }
 }

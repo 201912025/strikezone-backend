@@ -8,6 +8,7 @@ import com.strikezone.strikezone_backend.domain.post.entity.Post;
 import com.strikezone.strikezone_backend.domain.post.exception.PostExceptionType;
 import com.strikezone.strikezone_backend.domain.team.entity.Team;
 import com.strikezone.strikezone_backend.domain.team.entity.TeamName;
+import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
 import com.strikezone.strikezone_backend.domain.user.entity.User;
 import com.strikezone.strikezone_backend.domain.post.repository.PostRepository;
 import com.strikezone.strikezone_backend.domain.team.service.TeamService;
@@ -19,10 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -196,7 +194,6 @@ public class PostServiceTest {
         String username = "testUser";
         PostDeleteRequestServiceDTO deleteDTO = new PostDeleteRequestServiceDTO(postId, username);
 
-        // 게시글 작성자와 요청 사용자가 동일하도록 생성
         User user = User.builder().username(username).build();
         ReflectionTestUtils.setField(user, "userId", 1L);
 
@@ -238,10 +235,8 @@ public class PostServiceTest {
         String username = "otherUser";
         PostDeleteRequestServiceDTO deleteDTO = new PostDeleteRequestServiceDTO(postId, username);
 
-        // 게시글의 실제 작성자는 "ownerUser"로 설정
         User postOwner = User.builder().username("ownerUser").build();
         ReflectionTestUtils.setField(postOwner, "userId", 1L);
-        // 요청하는 사용자
         User currentUser = User.builder().username(username).build();
         ReflectionTestUtils.setField(currentUser, "userId", 2L);
 
@@ -268,7 +263,6 @@ public class PostServiceTest {
 
         Post post1 = Post.builder().title("Title1").content("Content1").build();
         Post post2 = Post.builder().title("Title2").content("Content2").build();
-        // 각 게시글에 유저를 추가
         post1.addUser(dummyUser);
         post2.addUser(dummyUser);
 
@@ -293,7 +287,6 @@ public class PostServiceTest {
         // Given
         Long postId = 1L;
         Post post = spy(Post.builder().title("Test Title").content("Test Content").build());
-        // 초기 좋아요 수 3으로 설정
         ReflectionTestUtils.setField(post, "likes", 3);
         User user = User.builder().username("testUser").build();
         ReflectionTestUtils.setField(user, "userId", 1L);
@@ -303,9 +296,188 @@ public class PostServiceTest {
         // When
         postService.incrementLikes(postId);
 
-        // Then: 좋아요 증가 호출 여부와 최종 값 (3 -> 4) 검증
+        // Then
         verify(post, times(1)).incrementLikes();
         assertEquals(4, post.getLikes(), "좋아요 수는 1 증가해야 합니다.");
+    }
+
+    @Test
+    @DisplayName("getPostById: 존재하는 게시글 조회 시 DTO 반환 및 조회수 1 증가")
+    public void testGetPostById_Success() {
+        Long postId = 1L;
+        Post post = spy(Post.builder().title("T").content("C").build());
+
+        User user = User.builder().username("u").build();
+        ReflectionTestUtils.setField(user, "userId", 1L);
+        post.addUser(user);
+
+        Team team = Team.builder().name(TeamName.KIA).build();
+        post.addTeam(team);
+
+        when(postRepository.findByIdWithUserAndTeam(postId))
+                .thenReturn(Optional.of(post));
+
+        int beforeViews = post.getViews();
+        PostResponseDTO dto = postService.getPostById(postId);
+
+        assertNotNull(dto);
+        assertEquals(beforeViews + 1, dto.getViews());
+        verify(post).incrementViews();
+    }
+
+
+    @Test
+    @DisplayName("getPostById: 없는 게시글 조회 시 BadRequestException")
+    public void testGetPostById_NotFound() {
+        Long postId = 1L;
+        when(postRepository.findByIdWithUserAndTeam(postId))
+                .thenReturn(Optional.empty());
+
+        BadRequestException ex = assertThrows(
+                BadRequestException.class,
+                () -> postService.getPostById(postId)
+        );
+        assertEquals(PostExceptionType.NOT_FOUND_POST, ex.getExceptionType());
+    }
+
+    @Test
+    @DisplayName("searchPosts: 키워드+타입으로 페이지 조회 후 DTO 매핑")
+    public void testSearchPosts() {
+        String keyword = "k";
+        String type    = "title";
+        Pageable pg    = PageRequest.of(0, 5);
+
+        Post post = Post.builder().title("T").content("C").build();
+        post.addUser(User.builder().username("u").build());
+        Page<Post> page = new PageImpl<>(List.of(post), pg, 1);
+
+        when(postRepository.searchPosts(keyword, type, pg))
+                .thenReturn(page);
+
+        Page<PostResponseDTO> result = postService.searchPosts(keyword, type, pg);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("T", result.getContent().get(0).getTitle());
+    }
+
+    @Test
+    @DisplayName("searchPostsByTeam: 유효한 팀명으로 페이지 조회")
+    public void testSearchPostsByTeam_Success() {
+        String teamName = "KIA";
+        Pageable pg     = PageRequest.of(0, 5);
+
+        Post post = Post.builder().title("T").content("C").build();
+        post.addUser(User.builder().username("u").build());
+        Page<Post> page = new PageImpl<>(List.of(post), pg, 1);
+
+        when(postRepository.findByTeam_Name(TeamName.KIA, pg))
+                .thenReturn(page);
+
+        Page<PostResponseDTO> result = postService.searchPostsByTeam(teamName, pg);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("T", result.getContent().get(0).getTitle());
+    }
+
+    @Test
+    @DisplayName("searchPostsByTeam: 잘못된 팀명 입력 시 BadRequestException")
+    public void testSearchPostsByTeam_InvalidTeam() {
+        String badName = "NOT_A_TEAM";
+        Pageable pg    = PageRequest.of(0, 5);
+
+        BadRequestException ex = assertThrows(
+                BadRequestException.class,
+                () -> postService.searchPostsByTeam(badName, pg)
+        );
+        assertEquals(TeamExceptionType.INVALID_TEAM_NAME, ex.getExceptionType());
+    }
+
+    @Test
+    @DisplayName("getPosts(page): 페이징 조회 후 DTO 매핑")
+    public void testGetPostsWithPage() {
+        int pageNo      = 2;
+        Pageable pg     = PageRequest.of(pageNo, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Post post = Post.builder().title("X").content("Y").build();
+        post.addUser(User.builder().username("u").build());
+        Page<Post> page = new PageImpl<>(List.of(post), pg, 1);
+
+        when(postRepository.findAll(pg))
+                .thenReturn(page);
+
+        Page<PostResponseDTO> result = postService.getPosts(pageNo);
+
+        assertEquals(1, result.getNumberOfElements());
+        assertEquals("X", result.getContent().get(0).getTitle());
+    }
+
+    @Test
+    @DisplayName("updatePost: 빈 타이틀 입력 시 INVALID_TITLE 예외")
+    public void testUpdatePost_InvalidTitle() {
+        Long postId = 1L;
+        Post post = spy(Post.builder().title("Old").content("Old").build());
+        User user = spy(User.builder().username("u").build());
+        doReturn(1L).when(user).getUserId();
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userService.getUserBySecurityUsername("u")).thenReturn(user);
+        doReturn(user).when(post).getUser();
+
+        PostUpdateRequestServiceDTO dto =
+                new PostUpdateRequestServiceDTO(postId, "u", "", "NewContent");
+
+        BadRequestException ex = assertThrows(
+                BadRequestException.class,
+                () -> postService.updatePost(dto)
+        );
+        assertEquals(PostExceptionType.INVALID_TITLE, ex.getExceptionType());
+    }
+
+    @Test
+    @DisplayName("updatePost: 빈 콘텐츠 입력 시 INVALID_CONTENT 예외")
+    public void testUpdatePost_InvalidContent() {
+        Long postId = 1L;
+        Post post = spy(Post.builder().title("Old").content("Old").build());
+        User user = spy(User.builder().username("u").build());
+        doReturn(1L).when(user).getUserId();
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(userService.getUserBySecurityUsername("u")).thenReturn(user);
+        doReturn(user).when(post).getUser();
+
+        PostUpdateRequestServiceDTO dto =
+                new PostUpdateRequestServiceDTO(postId, "u", "NewTitle", "   ");
+
+        BadRequestException ex = assertThrows(
+                BadRequestException.class,
+                () -> postService.updatePost(dto)
+        );
+        assertEquals(PostExceptionType.INVALID_CONTENT, ex.getExceptionType());
+    }
+
+    @Test
+    @DisplayName("getPosts: 전체 게시글 조회 후 DTO 리스트 반환")
+    public void testGetPosts_List() {
+        // Given
+        Post post1 = Post.builder().title("First").content("Content1").build();
+        Post post2 = Post.builder().title("Second").content("Content2").build();
+
+        User user = User.builder().username("user").build();
+        post1.addUser(user);
+        post2.addUser(user);
+        Team team = Team.builder().name(TeamName.KIA).build();
+        post1.addTeam(team);
+        post2.addTeam(team);
+
+        when(postRepository.findAll()).thenReturn(List.of(post1, post2));
+
+        // When
+        List<PostResponseDTO> result = postService.getPosts();
+
+        // Then
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("First", result.get(0).getTitle());
+        assertEquals("Second", result.get(1).getTitle());
+        verify(postRepository, times(1)).findAll();
     }
 
 }

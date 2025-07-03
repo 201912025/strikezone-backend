@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.strikezone.strikezone_backend.domain.post.dto.controller.PostRequestDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.controller.PostUpdateRequestDTO;
 import com.strikezone.strikezone_backend.domain.post.dto.response.PostResponseDTO;
+import com.strikezone.strikezone_backend.domain.post.dto.service.PostDeleteRequestServiceDTO;
 import com.strikezone.strikezone_backend.domain.post.exception.PostExceptionType;
 import com.strikezone.strikezone_backend.domain.post.service.PostService;
+import com.strikezone.strikezone_backend.domain.team.exception.TeamExceptionType;
 import com.strikezone.strikezone_backend.global.exception.type.BadRequestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -210,4 +216,124 @@ class PostControllerTest {
         verify(postService, Mockito.times(1)).incrementLikes(postId);
     }
 
+    @Test
+    @DisplayName("getPostsPaged: 페이징 조회 엔드포인트 테스트")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testGetPostsPaged() throws Exception {
+        Pageable pg = PageRequest.of(1, 10);
+        Page<PostResponseDTO> pageDto = new PageImpl<>(
+                List.of(PostResponseDTO.builder().postId(1L).title("A").content("B").teamName("T").username("u").views(0).likes(0).build()),
+                pg, 1
+        );
+        when(postService.getPosts(1)).thenReturn(pageDto);
+
+        mockMvc.perform(get("/api/posts/paged").param("page", "1"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.content[0].title").value("A"));
+
+        verify(postService, times(1)).getPosts(1);
+    }
+
+    @Test
+    @DisplayName("searchPosts: 키워드 검색 엔드포인트 테스트")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testSearchPostsEndpoint() throws Exception {
+        String kw = "key";
+        String st = "all";
+        Pageable pg = PageRequest.of(0, 20);
+        Page<PostResponseDTO> pageDto = new PageImpl<>(
+                List.of(PostResponseDTO.builder().postId(2L).title("X").content("Y").teamName("T").username("u").views(0).likes(0).build()),
+                pg, 1
+        );
+        when(postService.searchPosts(kw, st, pg)).thenReturn(pageDto);
+
+        mockMvc.perform(get("/api/posts/search")
+                       .param("keyword", kw)
+                       .param("searchType", st)
+                       .param("page", "0")
+                       .param("size", "20"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.content[0].title").value("X"));
+
+        verify(postService, times(1)).searchPosts(kw, st, pg);
+    }
+
+    @Test
+    @DisplayName("searchPostsByTeam: 정상 팀 검색 엔드포인트 테스트")
+    @WithMockUser(value="testUser", roles="USER")
+    void testSearchPostsByTeamSuccess() throws Exception {
+        String team = "KIA";
+        Pageable pg = PageRequest.of(0, 20);
+        Page<PostResponseDTO> pageDto = new PageImpl<>(
+                List.of(PostResponseDTO.builder().postId(3L).title("Z").content("W").teamName(team).username("u").views(0).likes(0).build()),
+                pg, 1
+        );
+        when(postService.searchPostsByTeam(team, pg)).thenReturn(pageDto);
+
+        mockMvc.perform(get("/api/posts/team")
+                       .param("teamName", team)
+                       .param("page", "0")
+                       .param("size", "20"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.content[0].teamName").value(team));
+
+        verify(postService, times(1)).searchPostsByTeam(team, pg);
+    }
+
+    @Test
+    @DisplayName("searchPostsByTeam: 잘못된 팀 이름 예외")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testSearchPostsByTeamInvalid() throws Exception {
+        String bad = "INVALID";
+        when(postService.searchPostsByTeam(eq(bad), any(Pageable.class)))
+                .thenThrow(new BadRequestException(TeamExceptionType.INVALID_TEAM_NAME));
+
+        mockMvc.perform(get("/api/posts/team").param("teamName", bad))
+               .andExpect(status().isBadRequest());
+
+        verify(postService, times(1)).searchPostsByTeam(eq(bad), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("deletePost: 정상 삭제 엔드포인트 테스트")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testDeletePostSuccess() throws Exception {
+        doNothing().when(postService).deletePost(any(PostDeleteRequestServiceDTO.class));
+
+        mockMvc.perform(delete("/api/posts/{postId}", 5L))
+               .andExpect(status().isNoContent());
+
+        verify(postService, times(1)).deletePost(any(PostDeleteRequestServiceDTO.class));
+    }
+
+    @Test
+    @DisplayName("deletePost: 없는 게시글 삭제 시 예외")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testDeletePostNotFound() throws Exception {
+        // deletePost가 호출될 때 BadRequestException이 던져지도록 stub 설정
+        doThrow(new BadRequestException(PostExceptionType.NOT_FOUND_POST))
+                .when(postService)
+                .deletePost(any(PostDeleteRequestServiceDTO.class));
+
+        mockMvc.perform(delete("/api/posts/{postId}", 123L))
+               .andExpect(status().isBadRequest());
+
+        verify(postService, times(1)).deletePost(any(PostDeleteRequestServiceDTO.class));
+    }
+
+    @Test
+    @DisplayName("getPopularPosts: 인기 글 조회 엔드포인트 테스트")
+    @WithMockUser(value = "testUser", roles = "USER")
+    void testGetPopularPosts() throws Exception {
+        List<PostResponseDTO> list = List.of(
+                PostResponseDTO.builder().postId(9L).title("P").content("Q").teamName("T").username("u").views(0).likes(0).build()
+        );
+        when(postService.getPopularPosts()).thenReturn(list);
+
+        mockMvc.perform(get("/api/posts/popular"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$[0].postId").value(9L));
+
+        verify(postService, times(1)).getPopularPosts();
+    }
 }

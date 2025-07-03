@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco' // jacoco
 }
 
 group = 'com.strikezone'
@@ -56,4 +57,12 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy tasks.named('jacocoTestReport') // jacoco
+}
+tasks.named('jacocoTestReport') {
+	reports {
+		html.required.set(true)   // 브라우저로 볼 수 있는 HTML 리포트
+		xml.required.set(true)    // CI 연동용 XML 리포트
+		csv.required.set(false)
+	}
 }
