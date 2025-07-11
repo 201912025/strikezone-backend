@@ -62,9 +62,13 @@
 
 - **데이터베이스**
     - Spring Data JPA
-    - 읽기 전용 분리 연결: 커스텀 `@ReadOnlyConnection` 어노테이션
     - MY SQL (RDS)
     - QueryDsl
 
 - **캐싱 & 성능**
     - Redis (ElasticCache)
+ 
+- **컨테이너 & 인프라**
+  - Docker  
+  - AWS EC2  
+  - AWS Application Load Balancer (ALB)
