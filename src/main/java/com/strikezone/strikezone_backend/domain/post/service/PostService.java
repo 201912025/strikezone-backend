@@ -155,7 +155,6 @@ public class PostService {
     }
 
     @ReadOnlyConnection
-    // 페이징 및 정렬이 적용된 전체 게시글 조회 (Page 버전)
     public Page<PostResponseDTO> getPosts(int page) {
         Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> posts = postRepository.findAll(pageable);

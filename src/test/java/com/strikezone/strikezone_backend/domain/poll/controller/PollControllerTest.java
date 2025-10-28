@@ -116,7 +116,6 @@ class PollControllerTest {
     void deletePollTest() throws Exception {
         // given
         Long pollId = 3L;
-        // pollService.deletePoll은 void 반환하므로, 특별한 리턴값 없이 동작함
 
         // when & then
         mockMvc.perform(delete("/api/polls/{pollId}", pollId))

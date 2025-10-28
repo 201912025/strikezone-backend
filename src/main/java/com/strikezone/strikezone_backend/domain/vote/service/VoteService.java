@@ -77,7 +77,6 @@ public class VoteService {
         User user = userRepository.findByUsername(userName)
                                   .orElseThrow(() -> new NotFoundException(VoteExceptionType.NOT_FOUND_USER));
 
-        // 사용자가 해당 투표에 참여했는지 확인
         Vote existingVote = voteRepository.findByPollAndUser(poll, user);
         if (existingVote == null) {
             throw new BadRequestException(VoteExceptionType.NOT_VOTED_YET);
@@ -106,10 +105,8 @@ public class VoteService {
                                                                                             .build())
                                                           .collect(Collectors.toList());
 
-        // 내림차순 정렬
         results.sort(Comparator.comparingLong(OptionFinalResultDto::getVoteCount).reversed());
 
-        // 순위 할당 (동점 처리)
         int rank = 1;
         for (int i = 0; i < results.size(); i++) {
             if (i > 0 && results.get(i).getVoteCount().equals(results.get(i - 1).getVoteCount())) {

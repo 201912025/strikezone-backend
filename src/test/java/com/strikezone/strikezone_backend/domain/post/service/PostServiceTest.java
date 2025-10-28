@@ -101,7 +101,6 @@ public class PostServiceTest {
         Long postId = 1L;
         Post post = spy(Post.builder().title("Same Title").content("Same Content").build());
 
-        // User 객체를 spy로 생성하여 getUserId()를 Stub 처리
         User user = spy(User.builder().username("testUser").build());
         doReturn(1L).when(user).getUserId();
 
@@ -110,7 +109,6 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(userService.getUserBySecurityUsername(updateDTO.getUsername())).thenReturn(user);
 
-        // post.getUser()가 user를 반환하도록 Stub
         doReturn(user).when(post).getUser();
 
         // When
@@ -130,11 +128,9 @@ public class PostServiceTest {
         Long postId = 1L;
         Post post = spy(Post.builder().title("Same Title").content("Same Content").build());
 
-        // User 엔티티: 기본키는 자동 생성이지만, 테스트에서는 Stub 처리로 ID 반환하도록 설정
         User postOwner = spy(User.builder().username("ownerUser").build());
         User differentUser = spy(User.builder().username("otherUser").build());
 
-        // Stub: getUserId()가 각각 원하는 값을 반환하도록 설정
         doReturn(1L).when(postOwner).getUserId();
         doReturn(2L).when(differentUser).getUserId();
 
@@ -144,7 +140,6 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(userService.getUserBySecurityUsername(updateDTO.getUsername())).thenReturn(differentUser);
 
-        // Stub post.getUser() to return postOwner
         doReturn(postOwner).when(post).getUser();
 
         // When / Then
@@ -164,7 +159,6 @@ public class PostServiceTest {
 
         User user = spy(User.builder().username("testUser").build());
 
-        // Stub: getUserId()가 null 대신 반환되도록 설정
         doReturn(1L).when(user).getUserId();
 
         PostUpdateRequestServiceDTO updateDTO =
@@ -173,7 +167,6 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(userService.getUserBySecurityUsername(updateDTO.getUsername())).thenReturn(user);
 
-        // Stub post.getUser() to return the same user
         doReturn(user).when(post).getUser();
 
         // When
@@ -183,7 +176,7 @@ public class PostServiceTest {
         assertNotNull(result);
         assertEquals("Same Title", result.getTitle());
         assertEquals("Same Content", result.getContent());
-        verify(postRepository, never()).save(any(Post.class)); // 업데이트가 발생하지 않았음을 검증
+        verify(postRepository, never()).save(any(Post.class));
     }
 
     @Test

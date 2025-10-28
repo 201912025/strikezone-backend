@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc // MockMvc 자동설정 및 시큐리티 빈 띄움
+@AutoConfigureMockMvc
 class TeamControllerTest {
 
     @Autowired

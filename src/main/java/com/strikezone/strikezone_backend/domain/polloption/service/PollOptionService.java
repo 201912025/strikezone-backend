@@ -25,7 +25,6 @@ public class PollOptionService {
 
     @Transactional
     public PollOptionResponseDto createPollOption(PollOptionCreateServiceRequestDto serviceDto) {
-        // pollId로 Poll 엔티티 조회
         Poll poll = pollRepository.findById(serviceDto.getPollId())
                                   .orElseThrow(() -> new NotFoundException(PollOptionExceptionType.NOT_FOUND_POLL_FOR_OPTION));
 

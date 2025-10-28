@@ -32,7 +32,6 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         } else if ("author".equalsIgnoreCase(searchType)) {
             builder.and(post.user.username.containsIgnoreCase(keyword));
         } else {
-            // 기본: 제목과 내용 동시 검색
             builder.and(post.title.containsIgnoreCase(keyword)
                                   .or(post.content.containsIgnoreCase(keyword)));
         }

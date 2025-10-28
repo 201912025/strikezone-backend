@@ -45,7 +45,6 @@ class PollServiceTest {
                                                                            .endDate(now.plusDays(1))
                                                                            .build();
 
-        // 엔티티 저장 시 자동생성된 id를 설정하기 위해 ReflectionTestUtils 사용
         Poll poll = Poll.builder()
                         .title(createDto.getTitle())
                         .description(createDto.getDescription())
@@ -103,7 +102,7 @@ class PollServiceTest {
     @Test
     @DisplayName("투표 주제를 삭제한다")
     void deletePollTest() {
-        // given 기존 투표 엔티티
+        // given
         LocalDateTime now = LocalDateTime.now();
         Poll poll = Poll.builder()
                         .title("삭제할 제목")
@@ -125,7 +124,7 @@ class PollServiceTest {
     @Test
     @DisplayName("투표 주제 목록을 조회한다")
     void getPollsTest() {
-        // given 여러 개의 투표 엔티티
+        // given
         LocalDateTime now = LocalDateTime.now();
         Poll poll1 = Poll.builder()
                          .title("제목1")

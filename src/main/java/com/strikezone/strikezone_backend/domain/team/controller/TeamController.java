@@ -41,7 +41,6 @@ public class TeamController {
 
         CreateTeamResponseDTO responseDTO = teamService.createTeam(serviceDTO);
 
-        // 생성된 리소스의 URI (예: /api/teams/{teamId})
         URI location = URI.create("/api/teams/" + responseDTO.getTeamId());
 
         return ResponseEntity.created(location).body(responseDTO);

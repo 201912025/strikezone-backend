@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc  // MockMvc 자동설정 및 시큐리티 빈 띄움
+@AutoConfigureMockMvc
 class PostControllerTest {
 
     @Autowired
@@ -206,7 +206,6 @@ class PostControllerTest {
     @DisplayName("좋아요 증가 컨트롤러 테스트: 204 No Content 반환")
     public void testIncrementLikesEndpoint() throws Exception {
         Long postId = 1L;
-        // postService.incrementLikes(postId)는 void이므로 doNothing() 사용
         doNothing().when(postService).incrementLikes(postId);
 
         mockMvc.perform(patch("/api/posts/{postId}/like", postId)

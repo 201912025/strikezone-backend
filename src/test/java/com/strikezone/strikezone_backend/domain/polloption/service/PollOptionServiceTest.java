@@ -49,7 +49,6 @@ class PollOptionServiceTest {
                                                                                         .optionText(optionText)
                                                                                         .build();
 
-        // Poll 엔티티 생성 (기본키는 자동 생성되므로 테스트 시 강제 주입)
         Poll poll = Poll.builder()
                         .title("투표 제목")
                         .description("투표 설명")
@@ -58,7 +57,6 @@ class PollOptionServiceTest {
                         .build();
         ReflectionTestUtils.setField(poll, "pollId", pollId);
 
-        // PollOption 엔티티 생성
         PollOption pollOption = PollOption.builder()
                                           .poll(poll)
                                           .optionText(optionText)
