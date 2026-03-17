@@ -35,16 +35,16 @@ public class PostController {
         return ResponseEntity.created(location).body(postResponseDTO);
     }
 
+    @GetMapping("/paged")
+    public ResponseEntity<Page<PostResponseDTO>> getPostsPaged(@RequestParam(defaultValue = "0") int page) {
+        Page<PostResponseDTO> postsPage = postService.getPostsWithUserAndTeam(page);
+        return ResponseEntity.ok(postsPage);
+    }
+
     @GetMapping
     public ResponseEntity<List<PostResponseDTO>> getPosts() {
         List<PostResponseDTO> postResponseDTOS = postService.getPosts();
         return ResponseEntity.ok(postResponseDTOS);
-    }
-
-    @GetMapping("/paged")
-    public ResponseEntity<Page<PostResponseDTO>> getPostsPaged(@RequestParam(defaultValue = "0") int page) {
-        Page<PostResponseDTO> postsPage = postService.getPosts(page);
-        return ResponseEntity.ok(postsPage);
     }
 
     @GetMapping("/search")

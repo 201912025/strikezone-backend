@@ -57,6 +57,13 @@ public class PostService {
     }
 
     @ReadOnlyConnection
+    public Page<PostResponseDTO> getPostsWithUserAndTeam(int page) {
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> posts = postRepository.findAllPostsWithDetails(pageable);
+        return posts.map(PostResponseDTO::fromEntity);
+    }
+
+    @ReadOnlyConnection
     public List<PostResponseDTO> getPosts() {
         List<Post> posts = postRepository.findAll();
         return PostResponseDTO.fromEntities(posts);
@@ -152,13 +159,6 @@ public class PostService {
         Page<Post> posts = postRepository.findByTeam_Name(teamNameEnum, pageable);
         return posts.map(PostResponseDTO::fromEntity);
 
-    }
-
-    @ReadOnlyConnection
-    public Page<PostResponseDTO> getPosts(int page) {
-        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Post> posts = postRepository.findAll(pageable);
-        return posts.map(PostResponseDTO::fromEntity);
     }
 
 }

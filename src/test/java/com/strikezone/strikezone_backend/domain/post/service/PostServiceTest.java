@@ -396,7 +396,7 @@ public class PostServiceTest {
         when(postRepository.findAll(pg))
                 .thenReturn(page);
 
-        Page<PostResponseDTO> result = postService.getPosts(pageNo);
+        Page<PostResponseDTO> result = postService.getPostsWithUserAndTeam(pageNo);
 
         assertEquals(1, result.getNumberOfElements());
         assertEquals("X", result.getContent().get(0).getTitle());

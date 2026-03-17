@@ -224,13 +224,13 @@ class PostControllerTest {
                 List.of(PostResponseDTO.builder().postId(1L).title("A").content("B").teamName("T").username("u").views(0).likes(0).build()),
                 pg, 1
         );
-        when(postService.getPosts(1)).thenReturn(pageDto);
+        when(postService.getPostsWithUserAndTeam(1)).thenReturn(pageDto);
 
         mockMvc.perform(get("/api/posts/paged").param("page", "1"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.content[0].title").value("A"));
 
-        verify(postService, times(1)).getPosts(1);
+        verify(postService, times(1)).getPostsWithUserAndTeam(1);
     }
 
     @Test
