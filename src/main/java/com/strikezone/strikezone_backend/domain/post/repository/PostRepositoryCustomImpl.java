@@ -1,18 +1,18 @@
 package com.strikezone.strikezone_backend.domain.post.repository;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.strikezone.strikezone_backend.domain.post.entity.Post;
-import com.strikezone.strikezone_backend.domain.post.entity.QPost;
-import com.strikezone.strikezone_backend.domain.user.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+
+import static com.strikezone.strikezone_backend.domain.post.entity.QPost.post;
+import static com.strikezone.strikezone_backend.domain.user.entity.QUser.user;
 
 @RequiredArgsConstructor
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
@@ -21,36 +21,50 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     @Override
     public Page<Post> searchPosts(String keyword, String searchType, Pageable pageable) {
-        QPost post = QPost.post;
-        QUser user = QUser.user;
 
-        BooleanBuilder builder = new BooleanBuilder();
-        if ("title".equalsIgnoreCase(searchType)) {
-            builder.and(post.title.containsIgnoreCase(keyword));
-        } else if ("content".equalsIgnoreCase(searchType)) {
-            builder.and(post.content.containsIgnoreCase(keyword));
-        } else if ("author".equalsIgnoreCase(searchType)) {
-            builder.and(post.user.username.containsIgnoreCase(keyword));
-        } else {
-            builder.and(post.title.containsIgnoreCase(keyword)
-                                  .or(post.content.containsIgnoreCase(keyword)));
-        }
+        List<Post> results = queryFactory
+                .selectFrom(post)
+                .leftJoin(post.user, user).fetchJoin()
+                .where(createSearchCondition(searchType, keyword))
+                .orderBy(post.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
-        OrderSpecifier<?> orderBy = post.createdAt.desc();
-
-        JPAQuery<Post> query = queryFactory.selectFrom(post)
-                                           .leftJoin(post.user, user).fetchJoin()
-                                           .where(builder)
-                                           .orderBy(orderBy);
-
-        List<Post> results = query.offset(pageable.getOffset())
-                                  .limit(pageable.getPageSize())
-                                  .fetch();
-
-        long total = queryFactory.selectFrom(post)
-                                 .where(builder)
-                                 .fetchCount();
+        long total = queryFactory
+                .selectFrom(post)
+                .where(createSearchCondition(searchType, keyword))
+                .fetchCount();
 
         return new PageImpl<>(results, pageable, total);
+    }
+
+    private BooleanExpression createSearchCondition(String searchType, String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return null;
+        }
+        if ("title".equalsIgnoreCase(searchType)) {
+            return titleContains(keyword);
+        }
+        if ("content".equalsIgnoreCase(searchType)) {
+            return contentContains(keyword);
+        }
+        if ("author".equalsIgnoreCase(searchType)) {
+            return authorContains(keyword);
+        }
+        // 기본값: 제목 OR 내용
+        return titleContains(keyword).or(contentContains(keyword));
+    }
+
+    private BooleanExpression titleContains(String keyword) {
+        return post.title.containsIgnoreCase(keyword);
+    }
+
+    private BooleanExpression contentContains(String keyword) {
+        return post.content.containsIgnoreCase(keyword);
+    }
+
+    private BooleanExpression authorContains(String keyword) {
+        return post.user.username.containsIgnoreCase(keyword);
     }
 }
